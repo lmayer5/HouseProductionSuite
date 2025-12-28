@@ -98,7 +98,7 @@ if ($newStatus === 'Shipped') {
                 <p>Your order <strong>#$id</strong> has been shipped and is on its way to you.</p>
                 <p>Get ready to hit the fairways!</p>
                 <br>
-                <p>Best regards,<br>The GreenFairway Team</p>
+                <p>Best regards,<br>The Martini Golf Tees Canada Team</p>
             </div>
         ";
 

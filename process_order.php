@@ -84,25 +84,26 @@ error_log("Initializing PHPMailer...");
 $mail = new PHPMailer(true);
 
 try {
-    // Server settings
+    // Server settings from environment variables
     $mail->isSMTP();
-    $mail->Host       = 'smtp.hostinger.com';
+    $mail->Host       = getenv('SMTP_HOST') ?: 'smtp.hostinger.com';
     $mail->SMTPAuth   = true;
-    $mail->Username   = 'orders@yourdomain.com'; // Placeholder
-    $mail->Password   = 'YourStrongPassword123!'; // Placeholder
+    $mail->Username   = getenv('SMTP_USER') ?: 'orders@example.com';
+    $mail->Password   = getenv('SMTP_PASS') ?: 'secret';
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-    $mail->Port       = 587;
+    $mail->Port       = getenv('SMTP_PORT') ?: 587;
     $mail->Timeout    = 5; // Set short timeout (5 seconds) just in case
 
-    // Check for placeholder credentials to avoid timeout
-    if ($mail->Password === 'YourStrongPassword123!' || $mail->Username === 'orders@yourdomain.com') {
-        // Log that we are skipping email
-        error_log("Skipping email sending: Placeholder credentials detected.");
-        sendResponse('success', 'Order processed (Email skipped due to placeholder credentials).');
+    // Check for missing SMTP credentials
+    if (getenv('SMTP_USER') === false) {
+        error_log("Skipping email sending: SMTP credentials not configured.");
+        sendResponse('success', 'Order processed (Email skipped - SMTP not configured).');
     }
 
     // Recipients
-    $mail->setFrom('orders@yourdomain.com', 'Martini Golf Tees Canada');
+    $fromEmail = getenv('SMTP_FROM_EMAIL') ?: 'orders@martinitees.ca';
+    $fromName = getenv('SMTP_FROM_NAME') ?: 'Martini Golf Tees Canada';
+    $mail->setFrom($fromEmail, $fromName);
     $mail->addAddress($email, $name);     // Add a recipient
 
     // Attachments
@@ -118,18 +119,75 @@ try {
 
     // Content
     $mail->isHTML(true);
-    $mail->Subject = 'Your GreenFairway Tees Invoice';
+    $mail->Subject = 'Your Martini Golf Tees Invoice';
     $mail->Body    = "
         <h1>Thank you for your order, $name!</h1>
         <p>We have received your order and it is being processed.</p>
         <p>Please find your invoice attached.</p>
         <br>
-        <p>Best regards,<br>The GreenFairway Team</p>
+        <p>Best regards,<br>The Martini Golf Tees Canada Team</p>
     ";
     $mail->AltBody = "Thank you for your order, $name! Please find your invoice attached.";
 
     $mail->send();
-    sendResponse('success', 'Order processed and email sent.');
+    error_log("Customer email sent successfully.");
+
+    // 5. Send Admin Notification Email
+    $adminEmail = getenv('ADMIN_EMAIL') ?: getenv('SMTP_FROM_EMAIL') ?: null;
+    
+    if ($adminEmail) {
+        try {
+            $adminMail = new PHPMailer(true);
+            $adminMail->isSMTP();
+            $adminMail->Host       = getenv('SMTP_HOST') ?: 'smtp.hostinger.com';
+            $adminMail->SMTPAuth   = true;
+            $adminMail->Username   = getenv('SMTP_USER') ?: 'orders@example.com';
+            $adminMail->Password   = getenv('SMTP_PASS') ?: 'secret';
+            $adminMail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $adminMail->Port       = getenv('SMTP_PORT') ?: 587;
+            $adminMail->Timeout    = 5;
+
+            $adminMail->setFrom($fromEmail, $fromName);
+            $adminMail->addAddress($adminEmail);
+
+            // Attach invoice to admin email too
+            if (file_exists($invoicePath)) {
+                $adminMail->addAttachment($invoicePath, 'Martini_Invoice.pdf');
+            }
+
+            // Build order summary for admin
+            $orderDetails = json_decode($orderJson, true);
+            $orderTotal = $orderDetails['total'] ?? 'N/A';
+            $orderId = $newOrder['id'];
+            $orderTime = date('M d, Y h:i A');
+
+            $adminMail->isHTML(true);
+            $adminMail->Subject = "🛒 New Order Received - $orderId";
+            $adminMail->Body = "
+                <div style='font-family: sans-serif; padding: 20px;'>
+                    <h2 style='color: #16a34a;'>New Order Received!</h2>
+                    <p><strong>Order ID:</strong> $orderId</p>
+                    <p><strong>Date:</strong> $orderTime</p>
+                    <hr style='border: 1px solid #eee;'>
+                    <h3>Customer Details</h3>
+                    <p><strong>Name:</strong> $name</p>
+                    <p><strong>Email:</strong> $email</p>
+                    <hr style='border: 1px solid #eee;'>
+                    <p><strong>Order Total:</strong> \$$orderTotal CAD</p>
+                    <p style='color: #666; font-size: 12px;'>Invoice PDF attached. View full order details in the <a href='admin.php'>Admin Dashboard</a>.</p>
+                </div>
+            ";
+            $adminMail->AltBody = "New Order: $orderId from $name ($email). Total: \$$orderTotal CAD";
+
+            $adminMail->send();
+            error_log("Admin notification email sent to $adminEmail");
+        } catch (Exception $adminEx) {
+            // Log but don't fail the order - customer email already sent
+            error_log("Admin notification failed: " . $adminEx->getMessage());
+        }
+    }
+
+    sendResponse('success', 'Order processed and emails sent.');
 
 } catch (Exception $e) {
     sendResponse('error', "Message could not be sent. Mailer Error: {$mail->ErrorInfo}");
