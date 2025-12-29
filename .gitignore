@@ -1,0 +1,52 @@
+# Build Directories
+build/
+build_new/
+build_plugins/
+*_artefacts/
+JuceLibraryCode/
+
+# IDE & Visual Studio
+.vs/
+.vscode/
+*.sln
+*.vcxproj
+*.vcxproj.user
+*.vcxproj.filters
+*.aps
+*.idb
+*.nupkg
+
+# Compilation & Intermediate Files
+*.obj
+*.iobj
+*.ipdb
+*.pdb
+*.ilk
+*.exp
+*.lib
+*.tlog
+*.exe
+*.vst3
+*.dll
+
+# Secrets & Environment
+.env
+
+# System Files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Python
+__pycache__/
+*.pyc
+
+# Local Tools & Dependencies
+ninja.exe
+JUCE/
+# We use CMake FetchContent for JUCE, so local checkout is explicit or ignored.
+# If you want to commit your local JUCE modification, remove the above line.
+
+# Logs
+*.log
+*.tmp

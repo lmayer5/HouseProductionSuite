@@ -1,0 +1,16 @@
+**********************************************************************
+** Visual Studio 2026 Developer Command Prompt v18.1.1
+** Copyright (c) 2025 Microsoft Corporation
+**********************************************************************
+[DEBUG:ext\vcvars.bat] Found potential v145 version file: 'Microsoft.VCToolsVersion.VC.14.50.18.0.txt'
+[DEBUG:ext\vcvars.bat] Testing v145 version file: 'Microsoft.VCToolsVersion.VC.14.50.18.0.txt'
+[vcvarsall.bat] Environment initialized for: 'x64'
+Building...
+[0/2] Re-checking globbed directories...
+[1/6] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine.dir\Source\PluginEditor.cpp.obj
+[2/6] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine.dir\Source\PluginProcessor.cpp.obj
+[3/6] Linking CXX static library "plugins\RhythmEngine\RhythmEngine_artefacts\Debug\Rhythm Engine_SharedCode.lib"
+[4/6] Linking CXX executable "plugins\RhythmEngine\RhythmEngine_artefacts\Debug\Standalone\Rhythm Engine.exe"
+[5/6] Linking CXX shared module "plugins\RhythmEngine\RhythmEngine_artefacts\Debug\VST3\Rhythm Engine.vst3\Contents\x86_64-win\Rhythm Engine.vst3"
+removing moduleinfo.json
+Build Done.

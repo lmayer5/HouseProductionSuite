@@ -1,0 +1,100 @@
+**********************************************************************
+** Visual Studio 2026 Developer Command Prompt v18.1.1
+** Copyright (c) 2025 Microsoft Corporation
+**********************************************************************
+[DEBUG:ext\vcvars.bat] Found potential v145 version file: 'Microsoft.VCToolsVersion.VC.14.50.18.0.txt'
+[DEBUG:ext\vcvars.bat] Testing v145 version file: 'Microsoft.VCToolsVersion.VC.14.50.18.0.txt'
+[vcvarsall.bat] Environment initialized for: 'x64'
+Building...
+[0/2] Re-checking globbed directories...
+[1/2] Re-running CMake...
+-- Configuring juceaide
+-- Building juceaide
+-- Exporting juceaide
+-- Testing juceaide
+-- Finished setting up juceaide
+-- Configuring done (3.4s)
+-- Generating done (0.2s)
+-- Build files have been written to: C:/personal_projects/house_prod_suite/build
+[0/4] Re-checking globbed directories...
+[1/81] Generating RhythmEngine_artefacts/JuceLibraryCode/JuceHeader.h
+[2/81] Generating MelodyEngine_artefacts/JuceLibraryCode/JuceHeader.h
+[3/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine.dir\__\__\_deps\juce-src\modules\juce_audio_processors\juce_audio_processors_lv2_libs.cpp.obj
+[4/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine.dir\__\__\_deps\juce-src\modules\juce_audio_processors\juce_audio_processors_ara.cpp.obj
+[5/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine.dir\__\__\_deps\juce-src\modules\juce_core\juce_core_CompilationTime.cpp.obj
+[6/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine_Standalone.dir\__\__\_deps\juce-src\modules\juce_audio_plugin_client\juce_audio_plugin_client_AAX_utils.cpp.obj
+[7/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine_Standalone.dir\__\__\_deps\juce-src\modules\juce_audio_plugin_client\juce_audio_plugin_client_AAX.cpp.obj
+[8/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine.dir\__\__\_deps\juce-src\modules\juce_audio_processors\juce_audio_processors_lv2_libs.cpp.obj
+[9/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine.dir\__\__\_deps\juce-src\modules\juce_audio_processors\juce_audio_processors_ara.cpp.obj
+[10/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine.dir\__\__\modules\djstih_dsp\djstih_dsp.cpp.obj
+[11/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine.dir\__\__\_deps\juce-src\modules\juce_data_structures\juce_data_structures.cpp.obj
+[12/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine.dir\__\__\_deps\juce-src\modules\juce_events\juce_events.cpp.obj
+[13/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine.dir\__\__\_deps\juce-src\modules\juce_dsp\juce_dsp.cpp.obj
+[14/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine.dir\__\__\_deps\juce-src\modules\juce_core\juce_core_CompilationTime.cpp.obj
+[15/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine.dir\__\__\_deps\juce-src\modules\juce_audio_basics\juce_audio_basics.cpp.obj
+[16/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine.dir\__\__\_deps\juce-src\modules\juce_audio_formats\juce_audio_formats.cpp.obj
+[17/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine.dir\Source\PluginProcessor.cpp.obj
+[18/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine.dir\__\__\_deps\juce-src\modules\juce_audio_devices\juce_audio_devices.cpp.obj
+[19/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine.dir\Source\PluginEditor.cpp.obj
+[20/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine.dir\Source\PluginEditor.cpp.obj
+[21/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine.dir\Source\PluginProcessor.cpp.obj
+[22/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine.dir\__\__\_deps\juce-src\modules\juce_gui_extra\juce_gui_extra.cpp.obj
+[23/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine_Standalone.dir\__\__\_deps\juce-src\modules\juce_audio_plugin_client\juce_audio_plugin_client_ARA.cpp.obj
+[24/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine_Standalone.dir\__\__\_deps\juce-src\modules\juce_audio_plugin_client\juce_audio_plugin_client_LV2.cpp.obj
+[25/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine_Standalone.dir\__\__\_deps\juce-src\modules\juce_audio_plugin_client\juce_audio_plugin_client_Unity.cpp.obj
+[26/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine_Standalone.dir\__\__\_deps\juce-src\modules\juce_audio_plugin_client\juce_audio_plugin_client_VST2.cpp.obj
+[27/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine_Standalone.dir\__\__\_deps\juce-src\modules\juce_audio_plugin_client\juce_audio_plugin_client_VST3.cpp.obj
+[28/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine.dir\__\__\_deps\juce-src\modules\juce_data_structures\juce_data_structures.cpp.obj
+[29/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine.dir\__\__\_deps\juce-src\modules\juce_gui_extra\juce_gui_extra.cpp.obj
+[30/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine_VST3.dir\__\__\_deps\juce-src\modules\juce_audio_plugin_client\juce_audio_plugin_client_AAX.cpp.obj
+[31/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine.dir\__\__\_deps\juce-src\modules\juce_audio_utils\juce_audio_utils.cpp.obj
+[32/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine_VST3.dir\__\__\_deps\juce-src\modules\juce_audio_plugin_client\juce_audio_plugin_client_LV2.cpp.obj
+[33/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine_VST3.dir\__\__\_deps\juce-src\modules\juce_audio_plugin_client\juce_audio_plugin_client_AAX_utils.cpp.obj
+[34/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine_VST3.dir\__\__\_deps\juce-src\modules\juce_audio_plugin_client\juce_audio_plugin_client_ARA.cpp.obj
+[35/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine.dir\__\__\_deps\juce-src\modules\juce_core\juce_core.cpp.obj
+[36/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine_VST3.dir\__\__\_deps\juce-src\modules\juce_audio_plugin_client\juce_audio_plugin_client_Standalone.cpp.obj
+[37/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine.dir\__\__\_deps\juce-src\modules\juce_events\juce_events.cpp.obj
+[38/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine_VST3.dir\__\__\_deps\juce-src\modules\juce_audio_plugin_client\juce_audio_plugin_client_Unity.cpp.obj
+[39/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine_VST3.dir\__\__\_deps\juce-src\modules\juce_audio_plugin_client\juce_audio_plugin_client_VST2.cpp.obj
+[40/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine_Standalone.dir\__\__\_deps\juce-src\modules\juce_audio_plugin_client\juce_audio_plugin_client_AAX.cpp.obj
+[41/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine_Standalone.dir\__\__\_deps\juce-src\modules\juce_audio_plugin_client\juce_audio_plugin_client_LV2.cpp.obj
+[42/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine_Standalone.dir\__\__\_deps\juce-src\modules\juce_audio_plugin_client\juce_audio_plugin_client_AAX_utils.cpp.obj
+[43/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine_Standalone.dir\__\__\_deps\juce-src\modules\juce_audio_plugin_client\juce_audio_plugin_client_ARA.cpp.obj
+[44/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine_Standalone.dir\__\__\_deps\juce-src\modules\juce_audio_plugin_client\juce_audio_plugin_client_VST2.cpp.obj
+[45/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine_Standalone.dir\__\__\_deps\juce-src\modules\juce_audio_plugin_client\juce_audio_plugin_client_Unity.cpp.obj
+[46/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine_Standalone.dir\__\__\_deps\juce-src\modules\juce_audio_plugin_client\juce_audio_plugin_client_VST3.cpp.obj
+[47/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine_VST3.dir\__\__\_deps\juce-src\modules\juce_audio_plugin_client\juce_audio_plugin_client_AAX.cpp.obj
+[48/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine.dir\__\__\modules\djstih_dsp\djstih_dsp.cpp.obj
+[49/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine_VST3.dir\__\__\_deps\juce-src\modules\juce_audio_plugin_client\juce_audio_plugin_client_AAX_utils.cpp.obj
+[50/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine_VST3.dir\__\__\_deps\juce-src\modules\juce_audio_plugin_client\juce_audio_plugin_client_ARA.cpp.obj
+[51/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine_VST3.dir\__\__\_deps\juce-src\modules\juce_audio_plugin_client\juce_audio_plugin_client_LV2.cpp.obj
+[52/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine_VST3.dir\__\__\_deps\juce-src\modules\juce_audio_plugin_client\juce_audio_plugin_client_Unity.cpp.obj
+[53/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine_VST3.dir\__\__\_deps\juce-src\modules\juce_audio_plugin_client\juce_audio_plugin_client_Standalone.cpp.obj
+[54/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine_VST3.dir\__\__\_deps\juce-src\modules\juce_audio_plugin_client\juce_audio_plugin_client_VST2.cpp.obj
+[55/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine.dir\__\__\_deps\juce-src\modules\juce_audio_processors\juce_audio_processors.cpp.obj
+[56/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine.dir\__\__\_deps\juce-src\modules\juce_audio_processors\juce_audio_processors.cpp.obj
+[57/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine.dir\__\__\_deps\juce-src\modules\juce_audio_basics\juce_audio_basics.cpp.obj
+[58/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine.dir\__\__\_deps\juce-src\modules\juce_graphics\juce_graphics.cpp.obj
+[59/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine.dir\__\__\_deps\juce-src\modules\juce_dsp\juce_dsp.cpp.obj
+[60/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine.dir\__\__\_deps\juce-src\modules\juce_graphics\juce_graphics.cpp.obj
+[61/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine.dir\__\__\_deps\juce-src\modules\juce_audio_formats\juce_audio_formats.cpp.obj
+[62/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine.dir\__\__\_deps\juce-src\modules\juce_graphics\juce_graphics_Harfbuzz.cpp.obj
+[63/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine.dir\__\__\_deps\juce-src\modules\juce_audio_devices\juce_audio_devices.cpp.obj
+[64/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine.dir\__\__\_deps\juce-src\modules\juce_core\juce_core.cpp.obj
+[65/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine_Standalone.dir\__\__\_deps\juce-src\modules\juce_audio_plugin_client\juce_audio_plugin_client_Standalone.cpp.obj
+[66/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine.dir\__\__\_deps\juce-src\modules\juce_audio_utils\juce_audio_utils.cpp.obj
+[67/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine_Standalone.dir\__\__\_deps\juce-src\modules\juce_audio_plugin_client\juce_audio_plugin_client_Standalone.cpp.obj
+[68/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine.dir\__\__\_deps\juce-src\modules\juce_graphics\juce_graphics_Harfbuzz.cpp.obj
+[69/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine.dir\__\__\_deps\juce-src\modules\juce_gui_basics\juce_gui_basics.cpp.obj
+[70/81] Linking CXX static library "plugins\RhythmEngine\RhythmEngine_artefacts\Debug\Rhythm Engine_SharedCode.lib"
+[71/81] Building CXX object plugins\RhythmEngine\CMakeFiles\RhythmEngine_VST3.dir\__\__\_deps\juce-src\modules\juce_audio_plugin_client\juce_audio_plugin_client_VST3.cpp.obj
+[72/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine_VST3.dir\__\__\_deps\juce-src\modules\juce_audio_plugin_client\juce_audio_plugin_client_VST3.cpp.obj
+[73/81] Building CXX object plugins\MelodyEngine\CMakeFiles\MelodyEngine.dir\__\__\_deps\juce-src\modules\juce_gui_basics\juce_gui_basics.cpp.obj
+[74/81] Linking CXX static library "plugins\MelodyEngine\MelodyEngine_artefacts\Debug\Melody Engine_SharedCode.lib"
+[75/81] Linking CXX executable "plugins\RhythmEngine\RhythmEngine_artefacts\Debug\Standalone\Rhythm Engine.exe"
+[76/81] Linking CXX shared module "plugins\RhythmEngine\RhythmEngine_artefacts\Debug\VST3\Rhythm Engine.vst3\Contents\x86_64-win\Rhythm Engine.vst3"
+removing moduleinfo.json
+[77/81] Linking CXX executable "plugins\MelodyEngine\MelodyEngine_artefacts\Debug\Standalone\Melody Engine.exe"
+[78/81] Linking CXX shared module "plugins\MelodyEngine\MelodyEngine_artefacts\Debug\VST3\Melody Engine.vst3\Contents\x86_64-win\Melody Engine.vst3"
+removing moduleinfo.json
+Build Done.
