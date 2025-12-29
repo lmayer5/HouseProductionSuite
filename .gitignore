@@ -2,8 +2,9 @@
 build/
 build_new/
 build_plugins/
+JUCE/
 *_artefacts/
-JuceLibraryCode/
+
 
 # IDE & Visual Studio
 .vs/
