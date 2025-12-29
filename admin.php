@@ -2,9 +2,11 @@
 session_start();
 
 // Configuration
-$password = getenv('ADMIN_PASSWORD');
+require_once 'env_loader.php';
+
+$password = get_config('ADMIN_PASSWORD');
 if (!$password) {
-    die("Configuration Error: Admin password not set in environment.");
+    die("Configuration Error: Admin password not set in environment. Please check your Hostinger 'Environment Variables' or create a 'private_data/config.php' file.");
 }
 // SECURE PATH: Move out of public_html
 $ordersFile = __DIR__ . '/../private_data/orders.json';

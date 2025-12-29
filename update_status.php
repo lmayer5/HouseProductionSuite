@@ -16,6 +16,9 @@ function sendResponse($success, $message) {
 $id = $_POST['id'] ?? null;
 $newStatus = $_POST['status'] ?? null;
 
+// Require standard environment loader
+require_once 'env_loader.php';
+
 if (!$id || !$newStatus) {
     sendResponse(false, 'Missing required fields.');
 }
@@ -67,24 +70,24 @@ if ($newStatus === 'Shipped') {
     try {
         // Server settings
         $mail->isSMTP();
-        $mail->Host       = getenv('SMTP_HOST') ?: 'smtp.example.com';
+        $mail->Host       = get_config('SMTP_HOST') ?: 'smtp.hostinger.com';
         $mail->SMTPAuth   = true;
-        $mail->Username   = getenv('SMTP_USER') ?: 'user@example.com';
-        $mail->Password   = getenv('SMTP_PASS') ?: 'secret';
+        $mail->Username   = get_config('SMTP_USER') ?: 'user@example.com';
+        $mail->Password   = get_config('SMTP_PASS') ?: 'secret';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port       = getenv('SMTP_PORT') ?: 587;
+        $mail->Port       = get_config('SMTP_PORT') ?: 587;
         $mail->Timeout    = 5;
 
         // Check for placeholder credentials
-        if (getenv('SMTP_USER') === false) {
+        if (get_config('SMTP_USER') === false) {
             error_log("Skipping shipping email: SMTP credentials not set.");
             // We still return success because the status WAS updated
             sendResponse(true, 'Status updated (Email skipped due to missing config).');
         }
 
         // Recipients
-        $fromEmail = getenv('SMTP_FROM_EMAIL') ?: 'orders@example.com';
-        $fromName = getenv('SMTP_FROM_NAME') ?: 'GreenFairway Tees';
+        $fromEmail = get_config('SMTP_FROM_EMAIL') ?: 'orders@example.com';
+        $fromName = get_config('SMTP_FROM_NAME') ?: 'GreenFairway Tees';
         $mail->setFrom($fromEmail, $fromName);
         $mail->addAddress($customerEmail, $customerName);
 

@@ -4,6 +4,7 @@
 
 // 1. Load Composer autoloader
 require 'vendor/autoload.php';
+require_once 'env_loader.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -86,23 +87,23 @@ $mail = new PHPMailer(true);
 try {
     // Server settings from environment variables
     $mail->isSMTP();
-    $mail->Host       = getenv('SMTP_HOST') ?: 'smtp.hostinger.com';
+    $mail->Host       = get_config('SMTP_HOST') ?: 'smtp.hostinger.com';
     $mail->SMTPAuth   = true;
-    $mail->Username   = getenv('SMTP_USER') ?: 'orders@example.com';
-    $mail->Password   = getenv('SMTP_PASS') ?: 'secret';
+    $mail->Username   = get_config('SMTP_USER') ?: 'orders@example.com';
+    $mail->Password   = get_config('SMTP_PASS') ?: 'secret';
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-    $mail->Port       = getenv('SMTP_PORT') ?: 587;
+    $mail->Port       = get_config('SMTP_PORT') ?: 587;
     $mail->Timeout    = 5; // Set short timeout (5 seconds) just in case
 
     // Check for missing SMTP credentials
-    if (getenv('SMTP_USER') === false) {
+    if (get_config('SMTP_USER') === false) {
         error_log("Skipping email sending: SMTP credentials not configured.");
         sendResponse('success', 'Order processed (Email skipped - SMTP not configured).');
     }
 
     // Recipients
-    $fromEmail = getenv('SMTP_FROM_EMAIL') ?: 'orders@martinitees.ca';
-    $fromName = getenv('SMTP_FROM_NAME') ?: 'Martini Golf Tees Canada';
+    $fromEmail = get_config('SMTP_FROM_EMAIL') ?: 'orders@martinitees.ca';
+    $fromName = get_config('SMTP_FROM_NAME') ?: 'Martini Golf Tees Canada';
     $mail->setFrom($fromEmail, $fromName);
     $mail->addAddress($email, $name);     // Add a recipient
 
