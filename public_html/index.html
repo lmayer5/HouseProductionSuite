@@ -140,7 +140,10 @@
                     } else {
                         this.items.push({ ...product, quantity: 1 });
                     }
-                    this.drawerOpen = true; // Auto open on add
+                    // Only open mobile drawer on small screens (< lg breakpoint)
+                    if (window.innerWidth < 1024) {
+                        this.drawerOpen = true;
+                    }
                 },
 
                 remove(productId) {
@@ -264,17 +267,24 @@
                                 </table>
 
                                 <!-- Totals -->
-                                <div style="display: flex; justify-content: flex-end;">
+                                <div style="display: flex; justify-content: flex-end; margin-top: 30px;">
                                     <div style="width: 50%;">
-                                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eeeeee;">
-                                        <div style="display: flex; justify-content: space-between; padding: 15px 0; font-size: 20px;">
+                                        <div style="display: flex; justify-content: space-between; padding: 15px 0; font-size: 20px; border-top: 2px solid #22c55e;">
                                             <span style="color: #166534; font-weight: bold;">Total (CAD)</span>
                                             <span style="color: #16a34a; font-weight: bold;">$${cartStore.total.toFixed(2)}</span>
                                         </div>
-                                        <div style="text-align: right; color: #999999; font-size: 10px; margin-top: 5px;">* Shipping and Applicable Taxes Included.</div>
+                                        <div style="text-align: right; color: #999999; font-size: 10px;">* Shipping and Applicable Taxes Included.</div>
                                     </div>
                                 </div>
-                                <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #eeeeee; text-align: center; color: #999999; font-size: 12px;">Thank you for your business!</div>
+
+                                <!-- Payment Instructions -->
+                                <div style="margin-top: 40px; padding: 20px; background-color: #f0fdf4; border-radius: 8px; text-align: center;">
+                                    <p style="color: #166534; font-weight: bold; margin: 0 0 10px 0;">Payment Instructions</p>
+                                    <p style="color: #374151; font-size: 14px; margin: 0;">Amount payable via e-Transfer to: <strong>bill@stubberfield.ca</strong></p>
+                                </div>
+
+                                <!-- Thank You -->
+                                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eeeeee; text-align: center; color: #999999; font-size: 12px;">Thank you for your business!</div>
                             </div>
                         `;
 
@@ -553,15 +563,13 @@
                         </ul>
 
                         <!-- Cart Button Mobile -->
-                        <div class="dropdown dropdown-end md:hidden">
-                            <label for="cart-drawer" class="btn btn-ghost btn-circle">
-                                <div class="indicator">
-                                    <i class="fa-solid fa-cart-shopping text-xl"></i>
-                                    <span class="badge badge-sm badge-primary indicator-item"
-                                        x-show="$store.cart.count > 0" x-text="$store.cart.count"></span>
-                                </div>
-                            </label>
-                        </div>
+                        <label for="cart-drawer" class="btn btn-ghost btn-circle md:hidden">
+                            <div class="indicator">
+                                <i class="fa-solid fa-cart-shopping text-xl"></i>
+                                <span class="badge badge-sm badge-primary indicator-item" x-show="$store.cart.count > 0"
+                                    x-text="$store.cart.count"></span>
+                            </div>
+                        </label>
 
                         <!-- Desktop Cart Trigger -->
                         <button class="btn btn-ghost btn-circle hidden md:inline-flex"
@@ -572,11 +580,6 @@
                                     x-text="$store.cart.count"></span>
                             </div>
                         </button>
-
-                        <!-- Mobile Drawer Toggle is handled by label for checkbox at top -->
-                        <label for="cart-drawer" class="btn btn-ghost btn-circle md:hidden">
-                            <i class="fa-solid fa-bars text-xl"></i>
-                        </label>
                     </div>
                 </div>
             </div>
@@ -819,7 +822,7 @@
                             <span class="text-brand-600" x-text="'$' + $store.cart.total.toFixed(2)"></span>
                         </div>
                         <div class="text-xs text-center text-gray-400 mb-6">
-                            * Applicable taxes extra. Prices in Canadian Dollars.
+                            Prices in Canadian Dollars.
                         </div>
 
                         <form @submit.prevent="submit" class="space-y-4">
@@ -919,14 +922,11 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> <!-- End of About Section -->
+    </div> <!-- End of drawer-content -->
 
-
-
-    </div>
-
-    <!-- DRAWER SIDE (Mobile Only Content) -->
-    <div class="drawer-side z-50 lg:hidden">
+    <!-- DRAWER SIDE (Mobile Cart Overlay) - MUST be inside drawer wrapper -->
+    <div class="drawer-side z-50">
         <label for="cart-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
         <div class="p-4 w-80 md:w-96 min-h-full bg-base-100 text-base-content flex flex-col">
 
@@ -998,7 +998,7 @@
             </div>
         </div>
     </div>
-    </div>
+    </div> <!-- End of drawer wrapper -->
 
     <!-- Success Modal -->
     <dialog id="order_success_modal" class="modal modal-bottom sm:modal-middle">
@@ -1076,7 +1076,8 @@
         </div>
         <div class="footer footer-center p-4 bg-base-300 text-base-content text-xs">
             <div>
-                <p>Copyright © 2025 - All right reserved by Martini Golf Tees Canada</p>
+                <p>© 2025 Martini Golf Tees, Inc. | "Martini Golf Tees" is a registered trademark of Martini Golf Tees,
+                    Inc.</p>
             </div>
         </div>
     </footer>

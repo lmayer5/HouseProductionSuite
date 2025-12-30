@@ -134,18 +134,18 @@ try {
     error_log("Customer email sent successfully.");
 
     // 5. Send Admin Notification Email
-    $adminEmail = getenv('ADMIN_EMAIL') ?: getenv('SMTP_FROM_EMAIL') ?: null;
+    $adminEmail = get_config('ADMIN_EMAIL') ?: get_config('SMTP_FROM_EMAIL') ?: null;
     
     if ($adminEmail) {
         try {
             $adminMail = new PHPMailer(true);
             $adminMail->isSMTP();
-            $adminMail->Host       = getenv('SMTP_HOST') ?: 'smtp.hostinger.com';
+            $adminMail->Host       = get_config('SMTP_HOST') ?: 'smtp.hostinger.com';
             $adminMail->SMTPAuth   = true;
-            $adminMail->Username   = getenv('SMTP_USER') ?: 'orders@example.com';
-            $adminMail->Password   = getenv('SMTP_PASS') ?: 'secret';
+            $adminMail->Username   = get_config('SMTP_USER') ?: 'orders@example.com';
+            $adminMail->Password   = get_config('SMTP_PASS') ?: 'secret';
             $adminMail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $adminMail->Port       = getenv('SMTP_PORT') ?: 587;
+            $adminMail->Port       = get_config('SMTP_PORT') ?: 587;
             $adminMail->Timeout    = 5;
 
             $adminMail->setFrom($fromEmail, $fromName);

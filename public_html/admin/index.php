@@ -1,15 +1,33 @@
 <?php
+// Enable Error Reporting for Debugging
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 session_start();
 
-// Configuration
-require_once '../env_loader.php';
+// Configuration - Use __DIR__ for robustness
+$envLoader = __DIR__ . '/../env_loader.php';
+if (!file_exists($envLoader)) {
+    die("Error: env_loader.php not found at: " . $envLoader);
+}
+require_once $envLoader;
 
 $password = get_config('ADMIN_PASSWORD');
 if (!$password) {
-    die("Configuration Error: Admin password not set in environment. Please check your Hostinger 'Environment Variables' or create a 'private_data/config.php' file.");
+    die("Configuration Error: ADMIN_PASSWORD not set. Check private_data/config.php.");
 }
-// SECURE PATH: Move out of public_html
-$ordersFile = __DIR__ . '/../../private_data/orders.json';
+
+// DATA PATHS - Use strict paths confirmed by debug.php
+// Debug result said: /home/.../private_data/orders.json
+$privateDataDir = realpath(__DIR__ . '/../../private_data');
+if (!$privateDataDir) {
+    // Fallback if realpath fails (e.g. perms), though debug said it's there
+    $privateDataDir = __DIR__ . '/../../private_data';
+}
+
+$ordersFile = $privateDataDir . '/orders.json';
+$settingsFile = $privateDataDir . '/settings.json';
 
 // Handle Logout
 if (isset($_GET['logout'])) {
@@ -70,15 +88,16 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     exit;
 }
 
-// SETTINGS FILE PATH
-// Try internal first for local dev, then external for prod
-$settingsFile = __DIR__ . '/private_data/settings.json';
-if (!file_exists($settingsFile)) {
-$settingsFile = __DIR__ . '/../private_data/settings.json';
-    if (!file_exists($settingsFile)) {
-        $settingsFile = __DIR__ . '/../../private_data/settings.json';
-    }
-}
+/*
+// SETTINGS FILE PATH - REDUNDANT
+// $settingsFile = __DIR__ . '/private_data/settings.json';
+// if (!file_exists($settingsFile)) {
+//     $settingsFile = __DIR__ . '/../private_data/settings.json';
+//     if (!file_exists($settingsFile)) {
+//         $settingsFile = __DIR__ . '/../../private_data/settings.json';
+//     }
+// }
+*/
 
 // HANDLE CLEAR ORDERS
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'clear_orders') {
@@ -350,7 +369,7 @@ if (file_exists($ordersFile)) {
                                     if(!confirm('Mark this order as Shipped?')) return;
                                     this.isLoading = true;
                                     
-                                    fetch('update_status.php', {
+                                    fetch('../update_status.php', {
                                         method: 'POST',
                                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                                         body: 'id=<?= $order['id'] ?>&status=Shipped'
@@ -399,7 +418,7 @@ if (file_exists($ordersFile)) {
                                 <td class="py-3 px-6 text-right">
                                     <a 
                                         x-show="status === 'Shipped' || true" 
-                                        href="<?= isset($order['invoice_file']) ? 'view_invoice.php?file=' . htmlspecialchars($order['invoice_file']) : '#' ?>" 
+                                        href="<?= isset($order['invoice_file']) ? '../view_invoice.php?file=' . htmlspecialchars($order['invoice_file']) : '#' ?>" 
                                         target="_blank"
                                         class="btn btn-xs btn-outline btn-info mr-2"
                                         :class="{ 'btn-disabled': !'<?= isset($order['invoice_file']) ? $order['invoice_file'] : '' ?>' }"

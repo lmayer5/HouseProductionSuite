@@ -1,14 +1,17 @@
-# System
-.DS_Store
-Thumbs.db
 
 # Sensitive Data (Do NOT commit these)
-private_data/orders.json
-private_data/invoices/
-private_data/settings.json
+private_data/
+config.php
+Martini Tees website configuration.txt
 
 # Local Environment
 .env
 
 # Dependencies
 vendor/
+composer.lock
+
+# System
+.DS_Store
+Thumbs.db
+error_log
