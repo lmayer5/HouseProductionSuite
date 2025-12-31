@@ -14,7 +14,9 @@
 //==============================================================================
 RhythmEngineAudioProcessorEditor::RhythmEngineAudioProcessorEditor(
     RhythmEngineAudioProcessor &p)
-    : AudioProcessorEditor(&p), audioProcessor(p) {
+    : AudioProcessorEditor(&p), audioProcessor(p), sequencerGrid(p) {
+
+  addAndMakeVisible(sequencerGrid);
 
   // Colors and Look
   getLookAndFeel().setColour(juce::Slider::thumbColourId, juce::Colours::cyan);
@@ -61,70 +63,57 @@ RhythmEngineAudioProcessorEditor::RhythmEngineAudioProcessorEditor(
   setupControl(sidechainSlider, sidechainLabel, sidechainAttachment,
                "SIDECHAIN_AMT", "Sidechain");
 
-  setSize(500, 400); // Taller UI
+  setSize(800, 600); // Larger Dashboard UI
 }
 
 RhythmEngineAudioProcessorEditor::~RhythmEngineAudioProcessorEditor() {}
 
 //==============================================================================
 void RhythmEngineAudioProcessorEditor::paint(juce::Graphics &g) {
-  g.fillAll(juce::Colours::black); // Clean black background
+  // Main background - deep space grey
+  g.fillAll(juce::Colour(0xFF0F0F14));
 
   auto area = getLocalBounds();
 
-  // Header
-  auto headerArea = area.removeFromTop(40);
+  // Header Title
+  auto headerArea = area.removeFromTop(50);
   g.setColour(juce::Colours::white);
-  g.setFont(20.0f);
-  g.drawText("RHYTHM ENGINE", headerArea, juce::Justification::centred);
+  g.setFont(juce::Font("Outfit", 24.0f, juce::Font::bold));
+  g.drawText("RHYTHM ENGINE", headerArea.reduced(20, 0),
+             juce::Justification::left);
 
-  // Backgrounds for sections
-  auto kickArea = area.removeFromTop(130).reduced(10);
-  auto bassArea = area.removeFromTop(180).reduced(10); // More height for bass
-
-  g.setColour(juce::Colours::darkgrey.withAlpha(0.3f));
-  g.fillRoundedRectangle(kickArea.toFloat(), 10.0f);
-  g.fillRoundedRectangle(bassArea.toFloat(), 10.0f);
-
-  // Section Titles
-  g.setColour(juce::Colours::cyan);
+  g.setColour(juce::Colour(0xFF00FFFF).withAlpha(0.5f));
   g.setFont(14.0f);
-  g.drawText("KICK", kickArea.removeFromTop(20),
-             juce::Justification::centredTop);
-  g.drawText("BASS", bassArea.removeFromTop(20),
-             juce::Justification::centredTop);
+  g.drawText("// STEP SEQUENCER v1.0", headerArea.reduced(20, 0),
+             juce::Justification::right);
+
+  // Background for knob row
+  auto knobArea = getLocalBounds().removeFromBottom(200).reduced(10);
+  g.setColour(juce::Colours::black.withAlpha(0.3f));
+  g.fillRoundedRectangle(knobArea.toFloat(), 10.0f);
+  g.setColour(juce::Colours::white.withAlpha(0.1f));
+  g.drawRoundedRectangle(knobArea.toFloat(), 10.0f, 1.0f);
 }
 
 void RhythmEngineAudioProcessorEditor::resized() {
   auto area = getLocalBounds();
-  auto headerH = 40;
-  area.removeFromTop(headerH);
 
-  // Kick Section
-  auto kickRow = area.removeFromTop(130).reduced(10);
-  kickRow.removeFromTop(20); // Title space
-  // Push down slightly to allow for attached labels
-  kickRow.removeFromTop(20);
+  // Header
+  area.removeFromTop(50);
 
-  int knobW = 90;
-  // Center the 2 kick knobs
-  auto kickCenter = kickRow.reduced((kickRow.getWidth() - (knobW * 2)) / 2, 0);
-  kickFreqSlider.setBounds(kickCenter.removeFromLeft(knobW));
-  kickCenter.removeFromLeft(10); // gap
-  kickDecaySlider.setBounds(kickCenter.removeFromLeft(knobW));
+  // Grid in the middle
+  auto gridArea = area.removeFromTop(350).reduced(20);
+  sequencerGrid.setBounds(gridArea);
 
-  // Bass Section
-  auto bassRow = area.removeFromTop(180).reduced(10);
-  bassRow.removeFromTop(20); // Title space
-  bassRow.removeFromTop(20); // Label clearance
+  // Knob Row at the bottom
+  auto knobRow = area.reduced(20, 10);
+  int knobW = knobRow.getWidth() / 7;
 
-  // 5 Knobs
-  // We can just flex them or split row
-  int bassKnobW = bassRow.getWidth() / 5;
-
-  bassCutoffSlider.setBounds(bassRow.removeFromLeft(bassKnobW).reduced(2));
-  bassDriveSlider.setBounds(bassRow.removeFromLeft(bassKnobW).reduced(2));
-  bassAttackSlider.setBounds(bassRow.removeFromLeft(bassKnobW).reduced(2));
-  bassDecaySlider.setBounds(bassRow.removeFromLeft(bassKnobW).reduced(2));
-  sidechainSlider.setBounds(bassRow.removeFromLeft(bassKnobW).reduced(2));
+  kickFreqSlider.setBounds(knobRow.removeFromLeft(knobW).reduced(5));
+  kickDecaySlider.setBounds(knobRow.removeFromLeft(knobW).reduced(5));
+  bassCutoffSlider.setBounds(knobRow.removeFromLeft(knobW).reduced(5));
+  bassDriveSlider.setBounds(knobRow.removeFromLeft(knobW).reduced(5));
+  bassAttackSlider.setBounds(knobRow.removeFromLeft(knobW).reduced(5));
+  bassDecaySlider.setBounds(knobRow.removeFromLeft(knobW).reduced(5));
+  sidechainSlider.setBounds(knobRow.removeFromLeft(knobW).reduced(5));
 }

@@ -5,6 +5,11 @@ set "NINJA_PATH=C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\Com
 
 call "%VS_PATH%\VC\Auxiliary\Build\vcvars64.bat"
 
+echo Configuring...
+if not exist build mkdir build
+"%CMAKE_PATH%" -S . -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DCMAKE_MAKE_PROGRAM="%NINJA_PATH%"
+if %errorlevel% neq 0 exit /b %errorlevel%
+
 echo Building...
 "%CMAKE_PATH%" --build build --config Release
 if %errorlevel% neq 0 exit /b %errorlevel%

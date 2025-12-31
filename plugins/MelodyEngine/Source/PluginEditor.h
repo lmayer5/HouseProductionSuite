@@ -10,9 +10,9 @@
 
 #pragma once
 
+#include "MelodyCanvasComponent.h"
 #include "PluginProcessor.h"
 #include <JuceHeader.h>
-
 
 //==============================================================================
 /**
@@ -30,6 +30,18 @@ private:
   // This reference is provided as a quick way for your editor to
   // access the processor object that created it.
   MelodyEngineAudioProcessor &audioProcessor;
+  MelodyCanvasComponent melodyCanvas;
+
+  // Controls
+  juce::Slider attackSlider, decaySlider, morphSlider, cutoffSlider, resSlider,
+      lfoRateSlider, lfoDepthSlider;
+  juce::Label attackLabel, decayLabel, morphLabel, cutoffLabel, resLabel,
+      lfoRateLabel, lfoDepthLabel;
+
+  using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
+  std::unique_ptr<SliderAttachment> attackAttachment, decayAttachment,
+      morphAttachment, cutoffAttachment, resAttachment, lfoRateAttachment,
+      lfoDepthAttachment;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MelodyEngineAudioProcessorEditor)
 };

@@ -11,7 +11,9 @@
 #pragma once
 
 #include "PluginProcessor.h"
+#include "SequencerGridComponent.h"
 #include <JuceHeader.h>
+
 
 class RhythmEngineAudioProcessorEditor : public juce::AudioProcessorEditor {
 public:
@@ -57,6 +59,8 @@ private:
       bassDecayAttachment;
   std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>
       sidechainAttachment;
+
+  SequencerGridComponent sequencerGrid;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(RhythmEngineAudioProcessorEditor)
 };

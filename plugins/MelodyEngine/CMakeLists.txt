@@ -33,6 +33,15 @@ target_sources(MelodyEngine PRIVATE
     Source/PluginProcessor.h
     Source/PluginEditor.cpp
     Source/PluginEditor.h
+    Source/MelodyStructures.h
+    Source/ScaleQuantizer.h
+    Source/ScaleQuantizer.cpp
+    Source/WavetableOscillator.h
+    Source/WavetableOscillator.cpp
+    Source/WavetableSynth.h
+    Source/WavetableSynth.cpp
+    Source/MelodyCanvasComponent.h
+    Source/MelodyCanvasComponent.cpp
 )
 
 # Link against JUCE and YOUR shared library

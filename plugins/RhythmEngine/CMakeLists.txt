@@ -33,6 +33,7 @@ target_sources(RhythmEngine PRIVATE
     Source/PluginProcessor.h
     Source/PluginEditor.cpp
     Source/PluginEditor.h
+    Source/SequencerGridComponent.cpp
 )
 
 # Link against JUCE and YOUR shared library
