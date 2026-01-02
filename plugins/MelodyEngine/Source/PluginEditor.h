@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "../../../shared/TELookAndFeel.h"
 #include "MelodyCanvasComponent.h"
 #include "PluginProcessor.h"
 #include <JuceHeader.h>
@@ -42,6 +43,9 @@ private:
   std::unique_ptr<SliderAttachment> attackAttachment, decayAttachment,
       morphAttachment, cutoffAttachment, resAttachment, lfoRateAttachment,
       lfoDepthAttachment;
+
+  // TE-style LookAndFeel
+  TELookAndFeel teLookAndFeel{TELookAndFeel::Accent::Melody};
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MelodyEngineAudioProcessorEditor)
 };

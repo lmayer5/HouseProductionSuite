@@ -41,6 +41,15 @@ RhythmEngineAudioProcessor::createParameterLayout() {
       "BASS_ATTACK", "Bass Attack", 0.001f, 0.5f, 0.01f));
   layout.add(std::make_unique<juce::AudioParameterFloat>(
       "BASS_DECAY", "Bass Decay", 0.1f, 2.0f, 0.4f));
+
+  // TE-style Punch-In FX (momentary, 0 = off, 1 = full)
+  layout.add(std::make_unique<juce::AudioParameterFloat>(
+      "FX_STUTTER", "FX Stutter", 0.0f, 1.0f, 0.0f));
+  layout.add(std::make_unique<juce::AudioParameterFloat>("FX_SWEEP", "FX Sweep",
+                                                         0.0f, 1.0f, 0.0f));
+  layout.add(std::make_unique<juce::AudioParameterFloat>(
+      "FX_BITCRUSH", "FX Bitcrush", 0.0f, 1.0f, 0.0f));
+
   return layout;
 }
 
@@ -98,6 +107,18 @@ void RhythmEngineAudioProcessor::prepareToPlay(double sampleRate,
   smoothBassCutoff.reset(sampleRate, 0.05);
   smoothBassDrive.reset(sampleRate, 0.05);
   smoothSidechainAmt.reset(sampleRate, 0.05);
+
+  // Prepare Punch-In FX
+  stutterFX.prepare(sampleRate, samplesPerBlock);
+  sweepFilterFX.prepare(sampleRate);
+
+  // Cache FX parameter pointers
+  if (!fxStutterParam)
+    fxStutterParam = apvts.getRawParameterValue("FX_STUTTER");
+  if (!fxSweepParam)
+    fxSweepParam = apvts.getRawParameterValue("FX_SWEEP");
+  if (!fxBitcrushParam)
+    fxBitcrushParam = apvts.getRawParameterValue("FX_BITCRUSH");
 }
 
 void RhythmEngineAudioProcessor::releaseResources() {}
@@ -136,6 +157,10 @@ void RhythmEngineAudioProcessor::processBlock(juce::AudioBuffer<float> &buffer,
           } else if (cmd.type == RhythmCommand::UpdateVelocity) {
             pattern.tracks[cmd.trackIdx].steps[cmd.stepIdx].velocity =
                 cmd.value;
+            patternDirty.store(true);
+          } else if (cmd.type == RhythmCommand::SetModifier) {
+            pattern.tracks[cmd.trackIdx].steps[cmd.stepIdx].modifier =
+                cmd.modifierValue;
             patternDirty.store(true);
           }
         }
@@ -183,7 +208,7 @@ void RhythmEngineAudioProcessor::processBlock(juce::AudioBuffer<float> &buffer,
     }
   }
 
-  // 3. Sequencer Triggering
+  // 3. Sequencer Triggering (with TE-style Step Components)
   if (isPlaying) {
     double quarterNoteLengthSamples = (60.0 / currentBpm) * sampleRate;
     double samplesPerStep = quarterNoteLengthSamples / 4.0; // 16th notes
@@ -196,45 +221,123 @@ void RhythmEngineAudioProcessor::processBlock(juce::AudioBuffer<float> &buffer,
             std::floor(lastProcessedSampleTime / samplesPerStep);
         double currentStepIdx = std::floor(currentSampleTime / samplesPerStep);
 
+        // Detect new step boundary
         if (currentStepIdx > lastStepIdx) {
           int stepToTrigger =
               static_cast<int>(currentStepIdx) % RhythmEngine::NUM_STEPS;
 
+          // Loop detection (for TE-style logic gates)
+          if (stepToTrigger == 0 &&
+              lastStepForLoopDetection == RhythmEngine::NUM_STEPS - 1) {
+            currentLoopCount++;
+          }
+          lastStepForLoopDetection = stepToTrigger;
+
           // Update atomic for GUI
           currentStepAtomic.store(stepToTrigger);
 
-          auto triggerWithProb = [&](int trackId, auto &env,
-                                     bool resetPhasor = false,
-                                     bool isBass = false) {
-            auto &step = pattern.tracks[trackId].steps[stepToTrigger];
-            if (step.active) {
-              if (random.nextFloat() <= step.probability) {
-                env.trigger();
-                if (resetPhasor)
-                  kickPhasor.reset();
-                if (isBass) {
-                  int note = pattern.tracks[trackId].midiNote;
-                  currentBassFreq =
-                      440.0f * std::pow(2.0f, (note - 69) / 12.0f);
-                }
-              }
+          // Reset ratchet counters at step start
+          for (auto &rc : ratchetCounters)
+            rc = 0;
+
+          // Lambda to check if step should trigger based on logic gates
+          auto shouldTriggerLogicGate =
+              [&](RhythmEngine::StepModifier mod) -> bool {
+            switch (mod) {
+            case RhythmEngine::StepModifier::SkipCycle:
+              return (currentLoopCount % 2) == 0;
+            case RhythmEngine::StepModifier::OnlyFirstCycle:
+              return currentLoopCount == 0;
+            default:
+              return true; // None, Ratchet, Glide all pass logic check
             }
           };
 
-          triggerWithProb(static_cast<int>(RhythmEngine::TrackId::Kick),
+          // Lambda for triggering with probability and modifiers
+          auto triggerWithMods = [&](int trackId, auto &env,
+                                     bool resetPhasor = false,
+                                     bool isBass = false) {
+            auto &step = pattern.tracks[trackId].steps[stepToTrigger];
+            if (!step.active)
+              return;
+            if (!shouldTriggerLogicGate(step.modifier))
+              return;
+            if (random.nextFloat() > step.probability)
+              return;
+
+            // Trigger the voice
+            env.trigger();
+            if (resetPhasor)
+              kickPhasor.reset();
+            if (isBass) {
+              int note = pattern.tracks[trackId].midiNote;
+              currentBassFreq = 440.0f * std::pow(2.0f, (note - 69) / 12.0f);
+            }
+          };
+
+          triggerWithMods(static_cast<int>(RhythmEngine::TrackId::Kick),
                           kickEnv, true);
-          triggerWithProb(static_cast<int>(RhythmEngine::TrackId::Bass),
+          triggerWithMods(static_cast<int>(RhythmEngine::TrackId::Bass),
                           bassEnv, false, true);
-          triggerWithProb(static_cast<int>(RhythmEngine::TrackId::Clap),
+          triggerWithMods(static_cast<int>(RhythmEngine::TrackId::Clap),
                           clapEnv);
-          triggerWithProb(static_cast<int>(RhythmEngine::TrackId::Hat), hatEnv);
+          triggerWithMods(static_cast<int>(RhythmEngine::TrackId::Hat), hatEnv);
         }
+
+        // Ratchet sub-step triggers (within step duration)
+        double positionInStep = std::fmod(currentSampleTime, samplesPerStep);
+        int currentStep =
+            static_cast<int>(std::floor(currentSampleTime / samplesPerStep)) %
+            RhythmEngine::NUM_STEPS;
+
+        // Check each track for ratchet modifiers
+        auto checkRatchet = [&](int trackId, auto &env,
+                                bool resetPhasor = false, bool isBass = false) {
+          auto &step = pattern.tracks[trackId].steps[currentStep];
+          if (!step.active)
+            return;
+
+          int divisions = 0;
+          if (step.modifier == RhythmEngine::StepModifier::Ratchet2)
+            divisions = 2;
+          else if (step.modifier == RhythmEngine::StepModifier::Ratchet4)
+            divisions = 4;
+
+          if (divisions > 0) {
+            double subStepLength = samplesPerStep / divisions;
+            int expectedSubStep =
+                static_cast<int>(positionInStep / subStepLength);
+
+            // Trigger if we've crossed into a new sub-step (skip first, already
+            // triggered)
+            if (expectedSubStep > ratchetCounters[trackId] &&
+                expectedSubStep < divisions) {
+              ratchetCounters[trackId] = expectedSubStep;
+              env.trigger();
+              if (resetPhasor)
+                kickPhasor.reset();
+              if (isBass) {
+                int note = pattern.tracks[trackId].midiNote;
+                currentBassFreq = 440.0f * std::pow(2.0f, (note - 69) / 12.0f);
+              }
+            }
+          }
+        };
+
+        checkRatchet(static_cast<int>(RhythmEngine::TrackId::Kick), kickEnv,
+                     true);
+        checkRatchet(static_cast<int>(RhythmEngine::TrackId::Bass), bassEnv,
+                     false, true);
+        checkRatchet(static_cast<int>(RhythmEngine::TrackId::Clap), clapEnv);
+        checkRatchet(static_cast<int>(RhythmEngine::TrackId::Hat), hatEnv);
       }
       lastProcessedSampleTime = currentSampleTime;
     }
   } else {
     lastProcessedSampleTime = -1.0;
     currentStepAtomic.store(-1);
+    currentLoopCount = 0;
+    lastStepForLoopDetection = -1;
   }
 
   // 4. Update DSP Parameters (Set Targets with Null Guards)
@@ -310,6 +413,39 @@ void RhythmEngineAudioProcessor::processBlock(juce::AudioBuffer<float> &buffer,
       rightChannel[s] = out;
   }
 
+  // ========== TE-style Punch-In FX (post-render) ==========
+  float stutterAmt = fxStutterParam ? fxStutterParam->load() : 0.0f;
+  float sweepAmt = fxSweepParam ? fxSweepParam->load() : 0.0f;
+  float bitcrushAmt = fxBitcrushParam ? fxBitcrushParam->load() : 0.0f;
+
+  // Stutter FX: activate on rising edge, process while active
+  if (stutterAmt > 0.5f) {
+    if (!stutterFX.isActive()) {
+      stutterFX.activate(djstih::StutterFX::Division::Sixteenth, currentBpm);
+    }
+    stutterFX.process(buffer);
+  } else {
+    stutterFX.deactivate();
+  }
+
+  // Sweep Filter FX: HP sweep based on amount
+  if (sweepAmt > 0.01f) {
+    sweepFilterFX.setMode(djstih::SweepFilterFX::Mode::HighPass);
+    sweepFilterFX.process(buffer, sweepAmt);
+  } else {
+    sweepFilterFX.setMode(djstih::SweepFilterFX::Mode::Off);
+  }
+
+  // Bitcrush FX: reduce bit depth when active
+  if (bitcrushAmt > 0.5f) {
+    bitcrushFX.setActive(true);
+    bitcrushFX.setBitDepth(4); // Lo-fi 4-bit crunch
+    bitcrushFX.setDownsample(4);
+    bitcrushFX.process(buffer);
+  } else {
+    bitcrushFX.setActive(false);
+  }
+
   updateSnapshotFromAudio();
 }
 
@@ -329,6 +465,7 @@ void RhythmEngineAudioProcessor::initializeDefaultPattern() {
       pattern.tracks[t].steps[s].active = false;
       pattern.tracks[t].steps[s].velocity = 1.0f;
       pattern.tracks[t].steps[s].probability = 1.0f;
+      pattern.tracks[t].steps[s].modifier = StepModifier::None;
     }
   }
 
@@ -386,6 +523,8 @@ juce::ValueTree RhythmEngineAudioProcessor::patternToValueTree() const {
       stepTree.setProperty("active", step.active, nullptr);
       stepTree.setProperty("velocity", step.velocity, nullptr);
       stepTree.setProperty("probability", step.probability, nullptr);
+      stepTree.setProperty("modifier", static_cast<int>(step.modifier),
+                           nullptr);
       trackTree.addChild(stepTree, -1, nullptr);
     }
 
@@ -422,6 +561,8 @@ void RhythmEngineAudioProcessor::patternFromValueTree(
         step.active = stepTree.getProperty("active", false);
         step.velocity = stepTree.getProperty("velocity", 1.0f);
         step.probability = stepTree.getProperty("probability", 1.0f);
+        step.modifier = static_cast<StepModifier>(
+            static_cast<int>(stepTree.getProperty("modifier", 0)));
       }
     }
   }

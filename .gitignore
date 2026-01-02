@@ -51,3 +51,4 @@ JUCE/
 # Logs
 *.log
 *.tmp
+build_log*.txt

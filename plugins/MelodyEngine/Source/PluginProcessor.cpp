@@ -103,6 +103,10 @@ void MelodyEngineAudioProcessor::prepareToPlay(double sampleRate,
 
   // Pre-allocate scratch buffer
   scratchBuffer.setSize(2, samplesPerBlock);
+
+  // Initialize parameter smoothers (50ms ramp)
+  smoothCutoff.reset(sampleRate, 0.05);
+  smoothResonance.reset(sampleRate, 0.05);
 }
 
 void MelodyEngineAudioProcessor::releaseResources() {
@@ -151,6 +155,9 @@ void MelodyEngineAudioProcessor::processBlock(juce::AudioBuffer<float> &buffer,
           if (cmd.type == MelodyCommand::SetEvent) {
             phrase.events[cmd.stepIdx] = cmd.eventData;
             phraseDirty.store(true);
+          } else if (cmd.type == MelodyCommand::SetModifier) {
+            phrase.events[cmd.stepIdx].modifier = cmd.modifierValue;
+            phraseDirty.store(true);
           }
         }
       }
@@ -186,10 +193,17 @@ void MelodyEngineAudioProcessor::processBlock(juce::AudioBuffer<float> &buffer,
         float attack = attackParam ? attackParam->load() : 0.01f;
         float decay = decayParam ? decayParam->load() : 0.4f;
         float morph = morphParam ? morphParam->load() : 0.0f;
-        float cutoff = cutoffParam ? cutoffParam->load() : 2000.0f;
-        float resonance = resonanceParam ? resonanceParam->load() : 0.0f;
         float lfoRate = lfoRateParam ? lfoRateParam->load() : 1.0f;
         float lfoDepth = lfoDepthParam ? lfoDepthParam->load() : 0.0f;
+
+        // Set target values for smoothed parameters
+        smoothCutoff.setTargetValue(cutoffParam ? cutoffParam->load()
+                                                : 2000.0f);
+        smoothResonance.setTargetValue(resonanceParam ? resonanceParam->load()
+                                                      : 0.0f);
+
+        float cutoff = smoothCutoff.getNextValue();
+        float resonance = smoothResonance.getNextValue();
 
         synth.setParameters(attack, decay, morph, cutoff, resonance, lfoDepth,
                             lfoRate);
@@ -199,11 +213,30 @@ void MelodyEngineAudioProcessor::processBlock(juce::AudioBuffer<float> &buffer,
           synth.processBlock(buffer, 0, samplesToNextStep);
         }
 
-        // Trigger Logic for the NEW step
+        // Trigger Logic for the NEW step (with TE-style logic gates)
         int nextStepIndex = (stepIndex + 1) % Melodic::NUM_PHRASE_STEPS;
         auto &event = phrase.events[nextStepIndex];
 
-        if (event.active) {
+        // Loop detection for logic gates
+        if (nextStepIndex == 0 &&
+            lastStepForLoopDetection == Melodic::NUM_PHRASE_STEPS - 1) {
+          currentLoopCount++;
+        }
+        lastStepForLoopDetection = nextStepIndex;
+
+        // Lambda to check if step should trigger based on logic gates
+        auto shouldTriggerLogicGate = [&](Melodic::NoteModifier mod) -> bool {
+          switch (mod) {
+          case Melodic::NoteModifier::SkipCycle:
+            return (currentLoopCount % 2) == 0;
+          case Melodic::NoteModifier::OnlyFirstCycle:
+            return currentLoopCount == 0;
+          default:
+            return true;
+          }
+        };
+
+        if (event.active && shouldTriggerLogicGate(event.modifier)) {
           // Probability check
           if (random.nextFloat() <= event.probability) {
             int quantizedNote = quantizer.quantize(
@@ -227,9 +260,11 @@ void MelodyEngineAudioProcessor::processBlock(juce::AudioBuffer<float> &buffer,
       currentStepAtomic.store(stepIndex);
 
     } else {
-      // Not playing
+      // Not playing - reset loop tracking
       synth.processBlock(buffer, 0, buffer.getNumSamples());
       currentStepAtomic.store(-1);
+      currentLoopCount = 0;
+      lastStepForLoopDetection = -1;
     }
   } else {
     // No Playhead

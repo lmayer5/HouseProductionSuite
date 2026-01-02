@@ -14,8 +14,10 @@
 //==============================================================================
 MelodyEngineAudioProcessorEditor::MelodyEngineAudioProcessorEditor(
     MelodyEngineAudioProcessor &p)
-    : AudioProcessorEditor(&p), audioProcessor(p),
-      melodyCanvas(p) { // Init canvas
+    : AudioProcessorEditor(&p), audioProcessor(p), melodyCanvas(p) {
+
+  // Apply TE-style LookAndFeel
+  setLookAndFeel(&teLookAndFeel);
 
   addAndMakeVisible(melodyCanvas);
 
@@ -60,14 +62,27 @@ MelodyEngineAudioProcessorEditor::MelodyEngineAudioProcessorEditor(
   setResizable(true, true);
 }
 
-MelodyEngineAudioProcessorEditor::~MelodyEngineAudioProcessorEditor() {}
+MelodyEngineAudioProcessorEditor::~MelodyEngineAudioProcessorEditor() {
+  setLookAndFeel(nullptr); // Clean up to avoid dangling pointer
+}
 
 //==============================================================================
 void MelodyEngineAudioProcessorEditor::paint(juce::Graphics &g) {
-  // (Our component is opaque, so we must completely fill the background with a
-  // solid colour)
-  g.fillAll(
-      getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
+  // TE-Style: Pure OLED Black background
+  g.fillAll(juce::Colour(0xFF000000));
+
+  // TE-Style: Header text
+  g.setColour(juce::Colours::white);
+  g.setFont(juce::Font("Consolas", 14.0f, juce::Font::bold));
+  g.drawText("MELODY ENGINE", getLocalBounds().removeFromTop(30).reduced(10, 0),
+             juce::Justification::left);
+
+  // Neon green version tag
+  g.setColour(juce::Colour(0xFF39FF14));
+  g.setFont(juce::Font("Consolas", 10.0f, juce::Font::plain));
+  g.drawText("// TE-SYNTH v2.0",
+             getLocalBounds().removeFromTop(30).reduced(10, 0),
+             juce::Justification::right);
 }
 
 void MelodyEngineAudioProcessorEditor::resized() {

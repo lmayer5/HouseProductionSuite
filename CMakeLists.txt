@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(HouseProductionSuite VERSION 0.0.1)
+project(HouseProductionSuite VERSION 1.0.0)
 
 # 1. Project-wide C++ Standard (C++20 is required for JUCE 8)
 

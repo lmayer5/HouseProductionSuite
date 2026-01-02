@@ -16,7 +16,6 @@
 #include <JuceHeader.h>
 #include <mutex>
 
-
 //==============================================================================
 class MelodyEngineAudioProcessor : public juce::AudioProcessor {
 public:
@@ -92,10 +91,11 @@ private:
 
 public:
   struct MelodyCommand {
-    enum Type { SetEvent };
+    enum Type { SetEvent, SetModifier };
     Type type;
     int stepIdx = 0;
     Melodic::NoteEvent eventData;
+    Melodic::NoteModifier modifierValue = Melodic::NoteModifier::None;
   };
 
   void queueCommand(const MelodyCommand &cmd) {
@@ -142,6 +142,17 @@ private:
   std::atomic<float> *resonanceParam = nullptr;
   std::atomic<float> *lfoRateParam = nullptr;
   std::atomic<float> *lfoDepthParam = nullptr;
+
+  // Smoothed DSP parameters (prevent zipper noise)
+  juce::SmoothedValue<float> smoothCutoff;
+  juce::SmoothedValue<float> smoothResonance;
+
+  // Loop tracking for TE-style logic gates
+  int currentLoopCount = 0;
+  int lastStepForLoopDetection = -1;
+
+  // Ratchet tracking for intra-step triggers
+  int ratchetCounter = 0;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MelodyEngineAudioProcessor)
 };

@@ -10,12 +10,12 @@ MelodyCanvasComponent::MelodyCanvasComponent(MelodyEngineAudioProcessor &p)
 MelodyCanvasComponent::~MelodyCanvasComponent() { stopTimer(); }
 
 void MelodyCanvasComponent::paint(juce::Graphics &g) {
-  g.fillAll(juce::Colour(0xFF0A0A0F)); // Cyberpunk Dark
+  // TE-Style: Pure OLED Black background
+  g.fillAll(juce::Colour(0xFF000000));
 
   // Update snapshot before painting (Safe Pull)
   processor.getGuiSnapshot(cachedPhrase);
   auto &phrase = cachedPhrase;
-  ScaleQuantizer quantizer; // Helper for interval lookup
   auto intervals = quantizer.getScaleIntervals(phrase.scaleName);
   int notesPerOctave = (int)intervals.size();
   int totalRows = NUM_OCTAVES * notesPerOctave;
@@ -23,23 +23,24 @@ void MelodyCanvasComponent::paint(juce::Graphics &g) {
   float stepWidth = getStepWidth();
   float noteHeight = getNoteHeight();
 
-  // Draw Grid Rows (Scale Degrees)
-  g.setColour(juce::Colour(0xFF2A2A35));
+  // TE-Style: Draw Grid Rows with sharp 1px white lines
+  g.setColour(juce::Colours::white.withAlpha(0.1f));
   for (int i = 0; i <= totalRows; ++i) {
     float y = i * noteHeight;
     g.drawHorizontalLine((int)y, 0.0f, (float)getWidth());
   }
 
-  // Draw Grid Columns (Time Steps)
+  // TE-Style: Draw Grid Columns with bar markers
   for (int i = 0; i <= NUM_STEPS; ++i) {
     float x = i * stepWidth;
-    g.setColour((i % 4 == 0) ? juce::Colour(0xFF3A3A45)
-                             : juce::Colour(0xFF1A1A25));
+    // Brighter lines on bar boundaries
+    float alpha = (i % 16 == 0) ? 0.4f : ((i % 4 == 0) ? 0.2f : 0.08f);
+    g.setColour(juce::Colours::white.withAlpha(alpha));
     g.drawVerticalLine((int)x, 0.0f, (float)getHeight());
   }
 
-  // Draw Notes
-  g.setColour(juce::Colour(0xFFCC00FF)); // Neon Purple
+  // TE-Style: Neon Green for Melody notes
+  g.setColour(juce::Colour(0xFF39FF14));
 
   for (int i = 0; i < phrase.events.size(); ++i) {
     auto &event = phrase.events[i];
@@ -80,6 +81,41 @@ void MelodyCanvasComponent::paint(juce::Graphics &g) {
         float w = stepWidth * (event.duration / 0.25f); // Duration in 16ths
 
         g.fillRect(x + 1, y + 1, w - 2, noteHeight - 2);
+
+        // TE-Style: Draw modifier icons on notes
+        float iconSize = std::min(noteHeight * 0.4f, 6.0f);
+        float iconX = x + w - iconSize - 3;
+        float iconY = y + 3;
+        g.setColour(juce::Colours::white.withAlpha(0.9f));
+
+        switch (event.modifier) {
+        case Melodic::NoteModifier::Ratchet2:
+          g.fillEllipse(iconX, iconY, iconSize * 0.4f, iconSize * 0.4f);
+          g.fillEllipse(iconX + iconSize * 0.5f, iconY, iconSize * 0.4f,
+                        iconSize * 0.4f);
+          break;
+        case Melodic::NoteModifier::Ratchet4:
+          g.fillEllipse(iconX, iconY, iconSize * 0.35f, iconSize * 0.35f);
+          g.fillEllipse(iconX + iconSize * 0.4f, iconY, iconSize * 0.35f,
+                        iconSize * 0.35f);
+          g.fillEllipse(iconX, iconY + iconSize * 0.4f, iconSize * 0.35f,
+                        iconSize * 0.35f);
+          g.fillEllipse(iconX + iconSize * 0.4f, iconY + iconSize * 0.4f,
+                        iconSize * 0.35f, iconSize * 0.35f);
+          break;
+        case Melodic::NoteModifier::SkipCycle:
+          g.drawLine(iconX, iconY + iconSize, iconX + iconSize, iconY, 1.5f);
+          break;
+        case Melodic::NoteModifier::OnlyFirstCycle:
+          g.setFont(juce::Font("Consolas", iconSize * 1.2f, juce::Font::bold));
+          g.drawText("1", (int)iconX, (int)iconY, (int)iconSize, (int)iconSize,
+                     juce::Justification::centred);
+          break;
+        default:
+          break;
+        }
+        // Reset color for next note
+        g.setColour(juce::Colour(0xFF39FF14));
       }
     }
   }
@@ -130,7 +166,6 @@ void MelodyCanvasComponent::mouseDrag(const juce::MouseEvent &event) {
 
   if (step >= 0 && step < Melodic::NUM_PHRASE_STEPS) {
     auto &phrase = cachedPhrase; // Use local cache for context
-    ScaleQuantizer quantizer;
     auto intervals = quantizer.getScaleIntervals(phrase.scaleName);
     int notesPerOctave = (int)intervals.size();
 
@@ -175,10 +210,7 @@ float MelodyCanvasComponent::getStepWidth() const {
 }
 
 float MelodyCanvasComponent::getNoteHeight() const {
-  ScaleQuantizer q; // Temp
-  // Assuming minor/7 notes for now to calculate height roughly
-  // Better to get it dynamically in paint but for helper we strictly need
-  // context. Let's assume 7 notes per octave for standard scales
+  // Use 7 notes per octave for standard scales layout
   return (float)getHeight() / (float)(NUM_OCTAVES * 7);
 }
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "PluginProcessor.h"
+#include "ScaleQuantizer.h"
 #include <JuceHeader.h>
 
 class MelodyCanvasComponent : public juce::Component, public juce::Timer {
@@ -40,6 +41,7 @@ private:
   // Current Scale context cache (to avoid repeated lookups if we wanted
   // optimization) For now we will pull from processor on each paint/click
   Melodic::Phrase cachedPhrase;
+  ScaleQuantizer quantizer; // Cached to avoid allocations in paint()
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MelodyCanvasComponent)
 };

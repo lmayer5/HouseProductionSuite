@@ -10,10 +10,10 @@
 
 #pragma once
 
+#include "../../../shared/TELookAndFeel.h"
 #include "PluginProcessor.h"
 #include "SequencerGridComponent.h"
 #include <JuceHeader.h>
-
 
 class RhythmEngineAudioProcessorEditor : public juce::AudioProcessorEditor {
 public:
@@ -61,6 +61,21 @@ private:
       sidechainAttachment;
 
   SequencerGridComponent sequencerGrid;
+
+  // TE-style Punch-In FX Buttons (momentary)
+  juce::TextButton fxStutterBtn{"STUTTER"};
+  juce::TextButton fxSweepBtn{"SWEEP"};
+  juce::TextButton fxBitcrushBtn{"CRUSH"};
+
+  std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment>
+      fxStutterAttachment;
+  std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment>
+      fxSweepAttachment;
+  std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment>
+      fxBitcrushAttachment;
+
+  // TE-style LookAndFeel
+  TELookAndFeel teLookAndFeel{TELookAndFeel::Accent::Rhythm};
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(RhythmEngineAudioProcessorEditor)
 };

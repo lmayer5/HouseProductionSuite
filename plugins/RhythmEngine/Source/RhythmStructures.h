@@ -16,6 +16,19 @@ constexpr int NUM_TRACKS = 4;
 enum class TrackId : int { Kick = 0, Bass = 1, Hat = 2, Clap = 3 };
 
 /**
+ * Step modifiers inspired by Teenage Engineering OP-XY "Step Components".
+ * These modify HOW a step triggers rather than just IF it triggers.
+ */
+enum class StepModifier : uint8_t {
+  None = 0,        // Normal trigger
+  Ratchet2,        // Repeat note 2x within step duration
+  Ratchet4,        // Repeat note 4x within step duration
+  Glide,           // Parameter slide (for 808 pitch bends, filter sweeps)
+  SkipCycle,       // Play every other loop (modulo 2)
+  OnlyFirstCycle   // Play only on the first loop iteration
+};
+
+/**
  * Represents a single step in the sequencer grid.
  */
 struct Step {
@@ -23,6 +36,7 @@ struct Step {
   float velocity = 1.0f; // 0.0 to 1.0, affects volume/intensity
   float probability =
       1.0f; // 0.0 to 1.0, chance of triggering (for humanization)
+  StepModifier modifier = StepModifier::None; // TE-style step component
 };
 
 /**

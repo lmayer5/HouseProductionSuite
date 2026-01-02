@@ -11,69 +11,114 @@ SequencerGridComponent::~SequencerGridComponent() {}
 void SequencerGridComponent::paint(juce::Graphics &g) {
   auto area = getLocalBounds();
 
-  // Background - Dark grey/black dashboard look
-  g.setColour(juce::Colour(0xFF0A0A0F));
-  g.fillRoundedRectangle(area.toFloat(), 5.0f);
-
-  // Draw Glass Overlay Effect
-  juce::ColourGradient glassGradient(juce::Colours::white.withAlpha(0.05f), 0,
-                                     0, juce::Colours::transparentWhite, 0,
-                                     area.getHeight(), false);
-  g.setGradientFill(glassGradient);
-  g.fillRoundedRectangle(area.toFloat(), 5.0f);
+  // TE-Style: Pure OLED Black background
+  g.fillAll(juce::Colour(0xFF000000));
 
   // Use the thread-safe snapshot for painting (Safe Pull)
   processor.getGuiSnapshot(cachedPattern);
   auto &pattern = cachedPattern;
 
+  // TE Color Palette - per-track neon accents
+  const std::array<juce::Colour, RhythmEngine::NUM_TRACKS> trackColors = {
+      juce::Colour(0xFFFF4500), // Kick - Neon Red/Orange
+      juce::Colour(0xFF00BFFF), // Bass - Neon Blue
+      juce::Colour(0xFF00FFFF), // Hat - Neon Cyan
+      juce::Colour(0xFFFFFFFF)  // Clap - Pure White
+  };
+
+  // TE-Style: Check FX state for visual feedback
+  bool fxActive = false;
+  float stutterVal = 0.0f, sweepVal = 0.0f, crushVal = 0.0f;
+  if (auto *p = processor.apvts.getRawParameterValue("FX_STUTTER"))
+    stutterVal = p->load();
+  if (auto *p = processor.apvts.getRawParameterValue("FX_SWEEP"))
+    sweepVal = p->load();
+  if (auto *p = processor.apvts.getRawParameterValue("FX_BITCRUSH"))
+    crushVal = p->load();
+  fxActive = (stutterVal > 0.5f) || (sweepVal > 0.01f) || (crushVal > 0.5f);
+
+  // TE-Style: Draw FX active border/glow when effects are engaged
+  if (fxActive) {
+    g.setColour(juce::Colour(0xFFFF4500).withAlpha(0.15f));
+    g.fillAll();
+    g.setColour(juce::Colour(0xFFFF4500).withAlpha(0.8f));
+    g.drawRect(area, 3);
+  }
+
   for (int t = 0; t < RhythmEngine::NUM_TRACKS; ++t) {
     for (int s = 0; s < RhythmEngine::NUM_STEPS; ++s) {
       auto r = getStepBounds(t, s).toFloat();
       bool isActive = pattern.tracks[t].steps[s].active;
+      auto modifier = pattern.tracks[t].steps[s].modifier;
 
       if (isActive) {
         float velocityAlpha = pattern.tracks[t].steps[s].velocity;
+        auto trackColor = trackColors[t];
 
-        // Neon Purple Glow - brightness based on velocity
-        g.setColour(
-            juce::Colour(0xFFCC00FF).withAlpha(0.6f * velocityAlpha + 0.2f));
-        g.fillRoundedRectangle(r.reduced(1.0f), 2.0f);
+        // TE-Style: Solid fill with velocity-based brightness
+        g.setColour(trackColor.withAlpha(0.3f + 0.7f * velocityAlpha));
+        g.fillRect(r.reduced(1.0f));
 
-        // Inner bright spot
-        g.setColour(juce::Colours::white.withAlpha(0.4f * velocityAlpha));
-        g.fillRoundedRectangle(r.reduced(3.0f), 1.0f);
+        // Draw modifier icons if present
+        if (modifier != RhythmEngine::StepModifier::None) {
+          g.setColour(juce::Colours::white.withAlpha(0.9f));
+          auto iconArea = r.reduced(4.0f);
 
-        // Outer Glow effect
-        g.setColour(juce::Colour(0xFFCC00FF).withAlpha(0.3f * velocityAlpha));
-        g.drawRoundedRectangle(r.expanded(1.0f), 2.0f, 2.0f);
-      } else {
-        // Inactive state - dark outline
-        g.setColour(juce::Colours::darkgrey.withAlpha(0.2f));
-        g.drawRoundedRectangle(r.reduced(1.0f), 2.0f, 1.0f);
+          switch (modifier) {
+          case RhythmEngine::StepModifier::Ratchet2:
+            // Draw "2x" symbol - two dots
+            g.fillEllipse(iconArea.getX() + 2, iconArea.getY() + 2, 4, 4);
+            g.fillEllipse(iconArea.getX() + 8, iconArea.getY() + 2, 4, 4);
+            break;
+          case RhythmEngine::StepModifier::Ratchet4:
+            // Draw "4x" symbol - four dots in grid
+            g.fillEllipse(iconArea.getX() + 2, iconArea.getY() + 2, 3, 3);
+            g.fillEllipse(iconArea.getX() + 7, iconArea.getY() + 2, 3, 3);
+            g.fillEllipse(iconArea.getX() + 2, iconArea.getY() + 7, 3, 3);
+            g.fillEllipse(iconArea.getX() + 7, iconArea.getY() + 7, 3, 3);
+            break;
+          case RhythmEngine::StepModifier::SkipCycle:
+            // Draw skip symbol - diagonal line
+            g.drawLine(iconArea.getX(), iconArea.getBottom(),
+                       iconArea.getRight(), iconArea.getY(), 2.0f);
+            break;
+          case RhythmEngine::StepModifier::OnlyFirstCycle:
+            // Draw "1" symbol
+            g.setFont(10.0f);
+            g.drawText("1", iconArea, juce::Justification::centred);
+            break;
+          case RhythmEngine::StepModifier::Glide:
+            // Draw ramp symbol
+            g.drawLine(iconArea.getX(), iconArea.getBottom(),
+                       iconArea.getRight(), iconArea.getY(), 1.5f);
+            break;
+          default:
+            break;
+          }
+        }
       }
+
+      // TE-Style: Sharp 1px white outline for all steps
+      g.setColour(juce::Colours::white.withAlpha(isActive ? 0.8f : 0.15f));
+      g.drawRect(r.reduced(0.5f), 1.0f);
     }
   }
 
-  // Draw Playhead
+  // Draw Playhead - TE-Style: Bright cyan line
   int currentStep = processor.currentStepAtomic.load();
   if (currentStep >= 0) {
-    float playheadX = 0;
-    // Calculate X based on first track bounds as reference
     auto firstStepPos = getStepBounds(0, 0).getX();
     auto lastStepPos = getStepBounds(0, RhythmEngine::NUM_STEPS - 1).getRight();
     float totalWidth = lastStepPos - firstStepPos;
 
-    playheadX = firstStepPos +
-                (currentStep / (float)RhythmEngine::NUM_STEPS) * totalWidth;
+    float playheadX =
+        firstStepPos +
+        (currentStep / (float)RhythmEngine::NUM_STEPS) * totalWidth;
 
-    g.setColour(juce::Colours::cyan.withAlpha(0.6f));
-    g.drawVerticalLine(static_cast<int>(playheadX), area.getY() + 5.0f,
-                       area.getBottom() - 5.0f);
-
-    // Add a small glow to playhead
-    g.setColour(juce::Colours::cyan.withAlpha(0.2f));
-    g.fillRect(playheadX - 1.0f, (float)area.getY() + 5.0f, 3.0f,
-               (float)area.getHeight() - 10.0f);
+    // TE-Style: Clean bright playhead
+    g.setColour(juce::Colour(0xFF00F3FF)); // Bright cyan
+    g.fillRect(playheadX - 1.0f, (float)area.getY() + 2.0f, 2.0f,
+               (float)area.getHeight() - 4.0f);
   }
 }
 

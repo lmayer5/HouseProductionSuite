@@ -17,11 +17,12 @@
 
 // Command structure for lock-free GUI -> Audio communication
 struct RhythmCommand {
-  enum Type { ToggleStep, UpdateVelocity, SetTrackGain };
+  enum Type { ToggleStep, UpdateVelocity, SetTrackGain, SetModifier };
   Type type;
   int trackIdx = 0;
   int stepIdx = 0;
   float value = 0.0f;
+  RhythmEngine::StepModifier modifierValue = RhythmEngine::StepModifier::None;
 };
 
 //==============================================================================
@@ -152,6 +153,14 @@ private:
   double lastProcessedSampleTime = -1.0;
   double currentBpm = 120.0;
 
+  // Loop tracking for TE-style logic gates (SkipCycle, OnlyFirstCycle)
+  int currentLoopCount = 0;
+  int lastStepForLoopDetection = -1;
+
+  // Sub-step tracking for ratchet (intra-step triggers)
+  std::array<int, RhythmEngine::NUM_TRACKS> ratchetCounters{};
+  double subStepAccumulator = 0.0;
+
   // Pre-allocated buffers
   juce::AudioBuffer<float> scratchBuffer;
 
@@ -164,6 +173,16 @@ private:
   juce::SmoothedValue<float> smoothBassCutoff;
   juce::SmoothedValue<float> smoothBassDrive;
   juce::SmoothedValue<float> smoothSidechainAmt;
+
+  // TE-style Punch-In FX
+  djstih::StutterFX stutterFX;
+  djstih::SweepFilterFX sweepFilterFX;
+  djstih::BitcrushFX bitcrushFX;
+
+  // FX Parameter Pointers (momentary)
+  std::atomic<float> *fxStutterParam = nullptr;
+  std::atomic<float> *fxSweepParam = nullptr;
+  std::atomic<float> *fxBitcrushParam = nullptr;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(RhythmEngineAudioProcessor)
 };

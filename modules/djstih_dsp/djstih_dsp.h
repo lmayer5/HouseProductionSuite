@@ -141,3 +141,6 @@ public:
 };
 
 } // namespace djstih
+
+// Include additional DSP components
+#include "PunchInFX.h"

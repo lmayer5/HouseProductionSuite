@@ -16,14 +16,10 @@ RhythmEngineAudioProcessorEditor::RhythmEngineAudioProcessorEditor(
     RhythmEngineAudioProcessor &p)
     : AudioProcessorEditor(&p), audioProcessor(p), sequencerGrid(p) {
 
-  addAndMakeVisible(sequencerGrid);
+  // Apply TE-style LookAndFeel
+  setLookAndFeel(&teLookAndFeel);
 
-  // Colors and Look
-  getLookAndFeel().setColour(juce::Slider::thumbColourId, juce::Colours::cyan);
-  getLookAndFeel().setColour(juce::Slider::rotarySliderFillColourId,
-                             juce::Colours::cyan.withAlpha(0.5f));
-  getLookAndFeel().setColour(juce::Slider::rotarySliderOutlineColourId,
-                             juce::Colours::black);
+  addAndMakeVisible(sequencerGrid);
 
   auto setupControl =
       [&](juce::Slider &slider, juce::Label &label,
@@ -63,36 +59,63 @@ RhythmEngineAudioProcessorEditor::RhythmEngineAudioProcessorEditor(
   setupControl(sidechainSlider, sidechainLabel, sidechainAttachment,
                "SIDECHAIN_AMT", "Sidechain");
 
-  setSize(800, 600); // Larger Dashboard UI
+  // TE-style Punch-In FX Buttons
+  auto setupFxButton = [&](juce::TextButton &btn, const juce::String &paramId) {
+    btn.setClickingTogglesState(true);
+    addAndMakeVisible(btn);
+
+    // Manual binding since JUCE doesn't have direct ButtonAttachment for floats
+    btn.onClick = [&, paramId]() {
+      if (auto *param = audioProcessor.apvts.getRawParameterValue(paramId)) {
+        param->store(btn.getToggleState() ? 1.0f : 0.0f);
+      }
+    };
+  };
+
+  setupFxButton(fxStutterBtn, "FX_STUTTER");
+  setupFxButton(fxSweepBtn, "FX_SWEEP");
+  setupFxButton(fxBitcrushBtn, "FX_BITCRUSH");
+
+  setSize(800, 650); // Taller to fit FX row
 }
 
-RhythmEngineAudioProcessorEditor::~RhythmEngineAudioProcessorEditor() {}
+RhythmEngineAudioProcessorEditor::~RhythmEngineAudioProcessorEditor() {
+  setLookAndFeel(nullptr); // Clean up to avoid dangling pointer
+}
 
 //==============================================================================
 void RhythmEngineAudioProcessorEditor::paint(juce::Graphics &g) {
-  // Main background - deep space grey
-  g.fillAll(juce::Colour(0xFF0F0F14));
+  // TE-Style: Pure OLED Black background
+  g.fillAll(juce::Colour(0xFF000000));
 
   auto area = getLocalBounds();
 
-  // Header Title
+  // Header area with TE-style typography
   auto headerArea = area.removeFromTop(50);
+
+  // Title - Sharp white text
   g.setColour(juce::Colours::white);
-  g.setFont(juce::Font("Outfit", 24.0f, juce::Font::bold));
+  g.setFont(juce::Font("Consolas", 22.0f, juce::Font::bold));
   g.drawText("RHYTHM ENGINE", headerArea.reduced(20, 0),
              juce::Justification::left);
 
-  g.setColour(juce::Colour(0xFF00FFFF).withAlpha(0.5f));
-  g.setFont(14.0f);
-  g.drawText("// STEP SEQUENCER v1.0", headerArea.reduced(20, 0),
+  // Version tag - Neon red/orange accent
+  g.setColour(juce::Colour(0xFFFF4500));
+  g.setFont(juce::Font("Consolas", 12.0f, juce::Font::plain));
+  g.drawText("// TE-STEP v2.0", headerArea.reduced(20, 0),
              juce::Justification::right);
 
-  // Background for knob row
-  auto knobArea = getLocalBounds().removeFromBottom(200).reduced(10);
-  g.setColour(juce::Colours::black.withAlpha(0.3f));
-  g.fillRoundedRectangle(knobArea.toFloat(), 10.0f);
-  g.setColour(juce::Colours::white.withAlpha(0.1f));
-  g.drawRoundedRectangle(knobArea.toFloat(), 10.0f, 1.0f);
+  // Thin separator line
+  g.setColour(juce::Colours::white.withAlpha(0.2f));
+  g.drawHorizontalLine(headerArea.getBottom(), 20.0f,
+                       (float)getWidth() - 20.0f);
+
+  // Control area label
+  auto knobArea = getLocalBounds().removeFromBottom(200);
+  g.setColour(juce::Colours::white.withAlpha(0.6f));
+  g.setFont(juce::Font("Consolas", 10.0f, juce::Font::plain));
+  g.drawText("DSP PARAMETERS", knobArea.removeFromTop(20).reduced(25, 0),
+             juce::Justification::left);
 }
 
 void RhythmEngineAudioProcessorEditor::resized() {
@@ -116,4 +139,11 @@ void RhythmEngineAudioProcessorEditor::resized() {
   bassAttackSlider.setBounds(knobRow.removeFromLeft(knobW).reduced(5));
   bassDecaySlider.setBounds(knobRow.removeFromLeft(knobW).reduced(5));
   sidechainSlider.setBounds(knobRow.removeFromLeft(knobW).reduced(5));
+
+  // TE-style FX Button Row at the very bottom
+  auto fxRow = getLocalBounds().removeFromBottom(45).reduced(20, 5);
+  int fxBtnW = fxRow.getWidth() / 3;
+  fxStutterBtn.setBounds(fxRow.removeFromLeft(fxBtnW).reduced(5));
+  fxSweepBtn.setBounds(fxRow.removeFromLeft(fxBtnW).reduced(5));
+  fxBitcrushBtn.setBounds(fxRow.removeFromLeft(fxBtnW).reduced(5));
 }
