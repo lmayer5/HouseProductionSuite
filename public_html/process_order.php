@@ -26,7 +26,19 @@ ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 error_reporting(E_ALL);
 
-require 'vendor/autoload.php';
+// 0. DEPENDENCY CHECK (FAIL FAST for Hostinger)
+$autoloadPath = __DIR__ . '/vendor/autoload.php';
+if (!file_exists($autoloadPath)) {
+    // Return Clean JSON Error
+    header('Content-Type: application/json');
+    http_response_code(200); // 200 so JS parses it
+    echo json_encode([
+        'status' => 'error', 
+        'message' => 'CRITICAL ERROR: vendor/autoload.php is missing. This means Composer libraries are not installed. Please run "composer install" on the server or upload the vendor folder.'
+    ]);
+    exit;
+}
+require $autoloadPath;
 require_once 'env_loader.php';
 
 use PHPMailer\PHPMailer\PHPMailer;

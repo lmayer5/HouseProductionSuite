@@ -340,7 +340,7 @@
 
                             console.log('Sending request to process_order.php...');
 
-                            fetch('process_order.php', {
+                            fetch('process_order.php?t=' + Date.now(), {
                                 method: 'POST',
                                 body: formData
                             })
