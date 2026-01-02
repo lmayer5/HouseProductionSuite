@@ -6,6 +6,21 @@
 // Catch any stray whitespace, warnings, or errors to ensure clean JSON output
 ob_start();
 
+// NUCLEAR ERROR HANDLING: specific catch for fatal startup errors (e.g. missing files)
+register_shutdown_function(function() {
+    $error = error_get_last();
+    if ($error && ($error['type'] === E_ERROR || $error['type'] === E_PARSE || $error['type'] === E_CORE_ERROR || $error['type'] === E_COMPILE_ERROR)) {
+        // Clear any half-written output
+        if (ob_get_length()) ob_clean(); 
+        
+        // Force JSON response
+        header('Content-Type: application/json');
+        http_response_code(200); // Return 200 so frontend parses the JSON
+        echo json_encode(['status' => 'error', 'message' => "Critical Server Error: " . $error['message'] . " in " . $error['file'] . " on line " . $error['line']]);
+        exit;
+    }
+});
+
 // Enable error logging but DISABLE display
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
@@ -38,9 +53,10 @@ try {
         throw new Exception('Invalid request method.');
     }
 
-    $name = $_POST['customer_name'] ?? '';
-    $email = $_POST['customer_email'] ?? '';
-    $githubUsername = $_POST['github_username'] ?? '';
+    $name = trim($_POST['customer_name'] ?? '');
+    $email = trim($_POST['customer_email'] ?? '');
+    $email = filter_var($email, FILTER_SANITIZE_EMAIL); // Remove illegal characters
+    $githubUsername = trim($_POST['github_username'] ?? '');
     $orderJson = $_POST['order_json'] ?? '';
     $pdfFile = $_FILES['invoice_pdf'] ?? null;
 
@@ -102,6 +118,7 @@ try {
 
     if (file_put_contents($ordersFile, $jsonOutput) === false) {
          error_log("Failed to write to orders.json");
+         $emailWarning = ($emailWarning ?? "") . " ERROR: Could not save order to database.";
     } else {
         // Debug Log
         file_put_contents(__DIR__ . '/../private_data/debug.log', date('c') . " - SAVED: " . $newOrder['id'] . "\n", FILE_APPEND);
@@ -140,7 +157,7 @@ try {
                     foreach ($newOrder['details']['cart'] as $item) {
                         // Check for Rhythm Engine (p_rhythm_bass) or Melodic Engine (p_melodic)
                         // IDs might have suffixes like _VST3, so use strpos or check start
-                        if (strpos($item['id'], 'p_rhythm_bass') !== false || strpos($item['id'], 'p_melodic') !== false) {
+                        if (isset($item['id']) && (strpos($item['id'], 'p_rhythm_bass') !== false || strpos($item['id'], 'p_melodic') !== false)) {
                             $hasFreePlugins = true;
                             break;
                         }
@@ -188,7 +205,7 @@ try {
             }
         }
 
-    } catch (Exception $emailEx) {
+    } catch (Throwable $emailEx) {
         error_log("Email Error: " . $emailEx->getMessage());
         $emailWarning = "Email failed: " . $emailEx->getMessage();
     }
@@ -200,7 +217,7 @@ try {
 
     sendResponse('success', $finalMsg);
 
-} catch (Exception $e) {
+} catch (Throwable $e) {
     error_log("Global Process Error: " . $e->getMessage());
     // Even global errors get sent as JSON
     sendResponse('error', "Processing Error: " . $e->getMessage());

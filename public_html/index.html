@@ -351,15 +351,25 @@
                                     throw new Error('Network response was not ok: ' + response.statusText);
                                 })
                                 .then(data => {
-                                    console.log('Success:', data);
-                                    document.getElementById('order_success_modal').showModal();
-                                    Alpine.store('cart').clear();
-                                    this.formData = { name: '', email: '', address: '', github_username: '' };
-                                    this.touched = { name: false, email: false, address: false, github_username: false };
+                                    console.log('Server Response:', data);
+
+                                    if (data.status === 'success') {
+                                        document.getElementById('order_success_modal').showModal();
+                                        Alpine.store('cart').clear();
+                                        this.formData = { name: '', email: '', address: '', github_username: '' };
+                                        this.touched = { name: false, email: false, address: false, github_username: false };
+
+                                        // Show warning if exists (e.g. Email failed but order saved)
+                                        if (data.message && data.message.includes('(')) {
+                                            alert('Note: ' + data.message);
+                                        }
+                                    } else {
+                                        throw new Error(data.message || 'Server processed request but returned error status.');
+                                    }
                                 })
                                 .catch(error => {
                                     console.error('Submission Error:', error);
-                                    alert('Order Error: ' + error.message);
+                                    alert('Order Failed: ' + error.message);
                                 })
                                 .finally(() => {
                                     this.isSubmitting = false;
