@@ -56,7 +56,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Admin Login - Gradient Solutions</title>
+        <title>Admin Login - Gradient Sound</title>
         <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
         <script src="https://cdn.tailwindcss.com"></script>
     </head>
@@ -144,11 +144,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 // LOAD SETTINGS
 $currentSettings = [
     "address" => "123 audio lane, toronto, on m5v 2h1",
-    "email" => "hello@gradientsolutions.ca",
+    "email" => "hello@gradientsound.shop",
     "phone" => "416-555-0199",
     "timezone" => "America/Toronto",
-    "about_title" => "about gradient solutions",
-    "about_text" => "gradient solutions is a boutique audio technology studio owned and operated by luke mayer, our chief audio engineer. as a sole proprietorship, we provide direct and personal connection to the tools you use. payments are processed via e-transfer, followed by automated github delivery.",
+    "about_title" => "about gradient sound",
+    "about_text" => "gradient sound is a boutique audio technology studio owned and operated by luke mayer, our chief audio engineer. as a sole proprietorship, we provide direct and personal connection to the tools you use. payments are processed via e-transfer, followed by automated github delivery.",
     "faq" => [
         ["question" => "how do i get my plugins?", "answer" => "after your e-transfer payment is confirmed, you will receive an automated invitation to a private github repository containing your downloads."]
     ]
@@ -177,7 +177,7 @@ if (file_exists($ordersFile)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Gradient Solutions</title>
+    <title>Dashboard - Gradient Sound</title>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
@@ -223,7 +223,7 @@ if (file_exists($ordersFile)) {
             <div class="flex-1">
                 <a class="btn btn-ghost text-xl text-brand-800">
                     <i class="fa-solid fa-wave-square"></i>
-                    Gradient Admin
+                    Gradient Sound Admin
                 </a>
             </div><a href="?logout=1" class="btn btn-sm btn-ghost text-red-500">Logout</a>
         </div>

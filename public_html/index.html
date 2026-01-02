@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gradient Solutions | Premium Audio Plugins</title>
+    <title>Gradient Sound | Premium Audio Plugins</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -84,7 +84,7 @@
             // CATALOG STORE (Renamed from 'products' to avoid conflict with DOM element id="products")
             // CATALOG STORE
             Alpine.store('catalog', {
-                // Gradient Solutions Plugin Catalog
+                // Gradient Sound Plugin Catalog
                 items: [
                     {
                         id: 'p_rhythm_bass',
@@ -246,8 +246,8 @@
                                 <!-- Header -->
                                 <div style="display: flex; justify-content: space-between; border-bottom: 4px solid #4f46e5; padding-bottom: 30px; margin-bottom: 30px;">
                                     <div>
-                                        <!-- Header with Gradient Solutions Branding -->
-                                        <h1 style="color: #3730a3; margin: 0; font-size: 24px; font-weight: bold;">Gradient Solutions</h1>
+                                        <!-- Header with Gradient Sound Branding -->
+                                        <h1 style="color: #3730a3; margin: 0; font-size: 24px; font-weight: bold;">Gradient Sound</h1>
                                         <p style="color: #666666; font-size: 14px; margin-top: 5px;">
                                             Luke Mayer - Chief Audio Engineer<br>
                                             ${Alpine.store('settings').email}<br>
@@ -554,7 +554,7 @@
                         <a href="#" class="btn btn-ghost h-auto hover:bg-transparent px-0">
                             <!-- Logo Image -->
                             <div class="text-3xl font-bold text-brand-500 tracking-tighter lowercase">gradient</div>
-                            <span class="sr-only">gradient solutions</span>
+                            <span class="sr-only">gradient sound</span>
                         </a>
                     </div>
                     <div class="flex-none gap-2">
@@ -597,7 +597,7 @@
                         <!-- Premium Badge -->
                         <div
                             class="inline-block mb-6 px-4 py-1.5 rounded-full border border-white/30 bg-white/10 backdrop-blur-md text-sm font-medium tracking-wider uppercase text-brand-100 animate-pulse">
-                            official gradient solutions store
+                            official gradient sound store
                         </div>
 
                         <!-- Main Headline with tight leading -->
@@ -828,7 +828,7 @@
                                 <input type="email" x-model="formData.email"
                                     class="input input-bordered w-full focus:input-primary transition-all"
                                     :class="{'input-error': touched.email && !isEmailValid}"
-                                    placeholder="studio@gradientsolutions.ca" />
+                                    placeholder="studio@gradientsound.shop" />
                                 <span x-show="touched.email && !isEmailValid" class="text-error text-xs mt-1 ml-1">Valid
                                     email required</span>
                             </div>
@@ -1010,7 +1010,7 @@
                     <i class="fa-solid fa-wave-square font-bold text-4xl text-brand-600"></i>
                 </div>
                 <h3 class="text-lg font-bold text-brand-700">Order Placed Successfully!</h3>
-                <p class="py-4 text-base-content/70">Thank you for shopping with Gradient Solutions. An invoice and your
+                <p class="py-4 text-base-content/70">Thank you for shopping with Gradient Sound. An invoice and your
                     download links have
                     been verified and emailed to you.</p>
                 <div class="modal-action justify-center">
@@ -1044,7 +1044,7 @@
         <div class="container mx-auto p-10 grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
             <div class="mb-4 md:mb-0">
                 <div class="text-2xl font-bold text-brand-500 tracking-tighter lowercase">gradient</div>
-                <p class="text-sm text-base-content/60 mt-1">© 2025 gradient solutions.<br>all rights reserved.</p>
+                <p class="text-sm text-base-content/60 mt-1">© 2025 gradient sound.<br>all rights reserved.</p>
             </div>
             <div>
                 <span class="footer-title opacity-100 text-brand-800">contact us</span>
@@ -1072,7 +1072,7 @@
         </div>
         <div class="footer footer-center p-4 bg-base-300 text-base-content text-xs">
             <div>
-                <p>© 2025 gradient solutions. all rights reserved.</p>
+                <p>© 2025 gradient sound. all rights reserved.</p>
             </div>
         </div>
     </footer>
@@ -1082,9 +1082,9 @@
         document.addEventListener('alpine:init', () => {
             Alpine.store('settings', {
                 address: '123 tech avenue, toronto, on',
-                email: 'hello@gradientsolutions.ca',
+                email: 'hello@gradientsound.shop',
                 phone: '416-555-0199',
-                about_title: 'about gradient solutions',
+                about_title: 'about gradient sound',
                 about_text: 'we create industry-leading audio plugins for music producers and sound engineers. our mission is to simplify your workflow while delivering analog-quality sound.',
                 pricing: {
                     "1": 49, "2": 89, "3": 129, "4": 159, "5": 189, "6": 219, "extra": 30

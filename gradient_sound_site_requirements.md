@@ -1,6 +1,6 @@
-# gradient_solutions_site
+# gradient_sound_site
 
-gradient solutions
+gradient sound
 
 Luke Mayer - Founder and Chief Audio Engineer 
 

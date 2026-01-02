@@ -124,8 +124,8 @@ try {
             $mail->Port       = get_config('SMTP_PORT') ?: 587;
             $mail->Timeout    = 8;
 
-            $fromEmail = get_config('SMTP_FROM_EMAIL') ?: 'admin@gradientsolutions.ca';
-            $fromName = get_config('SMTP_FROM_NAME') ?: 'Gradient Solutions';
+            $fromEmail = get_config('SMTP_FROM_EMAIL') ?: 'admin@gradientsound.shop';
+            $fromName = get_config('SMTP_FROM_NAME') ?: 'Gradient Sound';
             $mail->setFrom($fromEmail, $fromName);
             $mail->addAddress($email, $name);
 
@@ -135,15 +135,39 @@ try {
                  $mail->addAttachment($pdfFile['tmp_name'], 'Gradient_Invoice.pdf');
             }
 
-            $mail->isHTML(true);
-            $mail->Subject = 'Your Gradient Solutions Invoice';
-            $mail->Body    = "
+                $hasFreePlugins = false;
+                if (isset($newOrder['details']['cart']) && is_array($newOrder['details']['cart'])) {
+                    foreach ($newOrder['details']['cart'] as $item) {
+                        // Check for Rhythm Engine (p_rhythm_bass) or Melodic Engine (p_melodic)
+                        // IDs might have suffixes like _VST3, so use strpos or check start
+                        if (strpos($item['id'], 'p_rhythm_bass') !== false || strpos($item['id'], 'p_melodic') !== false) {
+                            $hasFreePlugins = true;
+                            break;
+                        }
+                    }
+                }
+
+                $downloadLinkHtml = "";
+                if ($hasFreePlugins) {
+                    $downloadLinkHtml = "
+                        <div style='background-color: #f0fdf4; border: 1px solid #22c55e; border-radius: 8px; padding: 15px; margin: 20px 0;'>
+                            <h3 style='margin-top: 0; color: #15803d;'>Download Your Plugins</h3>
+                            <p style='margin-bottom: 10px;'>You can download the latest release of the House Production Suite (V1.0) directly from GitHub:</p>
+                            <a href='https://github.com/lmayer5/HouseProductionSuite/tree/V1.0' style='display: inline-block; background-color: #16a34a; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;'>Download Release</a>
+                        </div>
+                    ";
+                }
+
+                $mail->isHTML(true);
+                $mail->Subject = 'Your Gradient Sound Invoice';
+                $mail->Body    = "
                 <h1>Thank you for your order, $name!</h1>
                 <p>We have received your order and it is being processed.</p>
                 " . ($githubUsername ? "<p>An admin will invite your GitHub account (<strong>$githubUsername</strong>) to the private repository shortly.</p>" : "") . "
+                $downloadLinkHtml
                 <p>Please find your invoice attached.</p>
                 <br>
-                <p>Best regards,<br>The Gradient Solutions Team</p>
+                <p>Best regards,<br>The Gradient Sound Team</p>
             ";
 
             $mail->send();

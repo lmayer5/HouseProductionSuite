@@ -1,6 +1,6 @@
 # Hostinger Deployment Guide 🚀
 
-A step-by-step guide to deploying Gradient Solutions on Hostinger shared hosting.
+A step-by-step guide to deploying Gradient Sound on Hostinger shared hosting.
 
 ---
 
@@ -49,7 +49,7 @@ gradient_solutions_site/
 
 1. Get FTP credentials from hPanel → **Files** → **FTP Accounts**
 2. Connect via FileZilla:
-   - Host: `ftp.yourdomain.com`
+   - Host: `ftp.gradientsound.shop`
    - Username: Your FTP username
    - Password: Your FTP password
    - Port: `21`
@@ -77,13 +77,13 @@ return [
     'ADMIN_PASSWORD' => 'YOUR_SECURE_PASSWORD_HERE',
     
     'SMTP_HOST' => 'smtp.hostinger.com',
-    'SMTP_USER' => 'orders@yourdomain.com',
+    'SMTP_USER' => 'orders@gradientsound.shop',
     'SMTP_PASS' => 'YOUR_EMAIL_PASSWORD',
     'SMTP_PORT' => 587,
-    'SMTP_FROM_EMAIL' => 'orders@yourdomain.com',
-    'SMTP_FROM_NAME' => 'Gradient Solutions',
+    'SMTP_FROM_EMAIL' => 'orders@gradientsound.shop',
+    'SMTP_FROM_NAME' => 'Gradient Sound',
     
-    'ADMIN_EMAIL' => 'admin@yourdomain.com',
+    'ADMIN_EMAIL' => 'admin@gradientsound.shop',
 ];
 ```
 
@@ -96,11 +96,11 @@ return [
 1. Enable SSH in hPanel → **Advanced** → **SSH Access**
 2. Connect via terminal:
    ```bash
-   ssh u123456789@yourdomain.com -p 65002
+   ssh u123456789@gradientsound.shop -p 65002
    ```
 3. Navigate and install:
    ```bash
-   cd domains/yourdomain.com
+   cd domains/gradientsound.shop
    composer install --no-dev
    ```
 
@@ -125,10 +125,10 @@ Via SSH or File Manager, set:
 
 SSH commands:
 ```bash
-chmod 755 ~/domains/yourdomain.com/private_data
-chmod 644 ~/domains/yourdomain.com/private_data/config.php
-chmod 666 ~/domains/yourdomain.com/private_data/*.json
-chmod 755 ~/domains/yourdomain.com/private_data/invoices
+chmod 755 ~/domains/gradientsound.shop/private_data
+chmod 644 ~/domains/gradientsound.shop/private_data/config.php
+chmod 666 ~/domains/gradientsound.shop/private_data/*.json
+chmod 755 ~/domains/gradientsound.shop/private_data/invoices
 ```
 
 ---
@@ -136,7 +136,7 @@ chmod 755 ~/domains/yourdomain.com/private_data/invoices
 ## Step 7: Create Email Account
 
 1. Go to hPanel → **Emails** → **Email Accounts**
-2. Create: `orders@yourdomain.com`
+2. Create: `orders@gradientsound.shop`
 3. Note the password (use in `config.php`)
 4. SMTP settings for Hostinger:
    - Host: `smtp.hostinger.com`
@@ -156,8 +156,8 @@ chmod 755 ~/domains/yourdomain.com/private_data/invoices
 
 ## Step 9: Test Your Site
 
-1. Visit `https://yourdomain.com` - Storefront should load
-2. Visit `https://yourdomain.com/admin/` - Login with your password
+1. Visit `https://gradientsound.shop` - Storefront should load
+2. Visit `https://gradientsound.shop/admin/` - Login with your password
 3. Place a test order
 4. Check admin dashboard for the order
 5. Verify email delivery

@@ -86,8 +86,8 @@ try {
             $mail->Port       = get_config('SMTP_PORT') ?: 587;
             $mail->Timeout    = 8;
 
-            $fromEmail = get_config('SMTP_FROM_EMAIL') ?: 'admin@gradientsolutions.ca';
-            $fromName = get_config('SMTP_FROM_NAME') ?: 'Gradient Solutions';
+            $fromEmail = get_config('SMTP_FROM_EMAIL') ?: 'admin@gradientsound.shop';
+            $fromName = get_config('SMTP_FROM_NAME') ?: 'Gradient Sound';
             $mail->setFrom($fromEmail, $fromName);
             $mail->addAddress($customerEmail, $customerName);
 
@@ -100,7 +100,7 @@ try {
                     <p>Your order <strong>#$id</strong> has been completed.</p>
                     <p>Time to make some noise!</p>
                     <br>
-                    <p>Best regards,<br>The Gradient Solutions Team</p>
+                    <p>Best regards,<br>The Gradient Sound Team</p>
                 </div>
             ";
             $mail->send();

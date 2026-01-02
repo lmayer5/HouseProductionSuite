@@ -1,10 +1,10 @@
-# Gradient Solutions 🎹
+# Gradient Sound 🎹
 
 A modern, ultralight e-commerce platform for premium audio plugins and VSTs.
 
 ## 🚀 Overview
 
-Gradient Solutions is a boutique audio technology studio offering simple, effective, and modern audio tools for music producers. Features a streamlined checkout with PDF invoice generation and GitHub-based digital delivery.
+Gradient Sound is a boutique audio technology studio offering simple, effective, and modern audio tools for music producers. Features a streamlined checkout with PDF invoice generation and GitHub-based digital delivery.
 
 ## 🛠️ Tech Stack
 
@@ -64,12 +64,12 @@ php -S localhost:8000 -t public_html
     return [
         'ADMIN_PASSWORD' => 'your-secure-password',
         'SMTP_HOST' => 'smtp.hostinger.com',
-        'SMTP_USER' => 'orders@yourdomain.com',
+        'SMTP_USER' => 'orders@gradientsound.shop',
         'SMTP_PASS' => 'your-email-password',
         'SMTP_PORT' => 587,
-        'SMTP_FROM_EMAIL' => 'orders@yourdomain.com',
-        'SMTP_FROM_NAME' => 'Gradient Solutions',
-        'ADMIN_EMAIL' => 'admin@yourdomain.com',
+        'SMTP_FROM_EMAIL' => 'orders@gradientsound.shop',
+        'SMTP_FROM_NAME' => 'Gradient Sound',
+        'ADMIN_EMAIL' => 'admin@gradientsound.shop',
     ];
     ```
 5.  **Install Composer:** Run `composer install` in root directory.
@@ -83,4 +83,4 @@ php -S localhost:8000 -t public_html
 
 ## © License
 
-© 2025 Gradient Solutions. All rights reserved.
+© 2025 Gradient Sound. All rights reserved.

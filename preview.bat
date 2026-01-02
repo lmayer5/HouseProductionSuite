@@ -1,7 +1,7 @@
 @echo off
-title Gradient Solutions Preview
+title Gradient Sound Preview
 echo ==========================================
-echo   Gradient Solutions - Local Preview
+echo   Gradient Sound - Local Preview
 echo ==========================================
 echo.
 
