@@ -74,7 +74,7 @@ try {
 
     // 4. Send Email Notification (Best effort, don't fail if this breaks)
     $emailWarning = null;
-    if ($newStatus === 'Completed' && get_config('SMTP_USER') !== false) {
+    if ($newStatus === 'Completed' && get_config('SMTP_USER')) {
         try {
             $mail = new PHPMailer(true);
             $mail->isSMTP();
