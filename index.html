@@ -93,7 +93,12 @@
                         image: "product_photos/rhythm_engine.png",
                         desc: "Essential rhythm and bass engine for your DAW. Free forever.",
                         options: ['VST3', 'AU'],
-                        badge: "Free"
+                        badge: "Free",
+                        isFree: true,
+                        downloads: {
+                            'VST3': 'downloads/rhythm_engine_vst3.zip',
+                            'AU': 'downloads/rhythm_engine_au.zip'
+                        }
                     },
                     {
                         id: 'p_melodic',
@@ -102,7 +107,12 @@
                         image: "product_photos/melody_engine.png",
                         desc: "Inspiring melodic engine to jumpstart your creativity.",
                         options: ['VST3', 'AU'],
-                        badge: "Free"
+                        badge: "Free",
+                        isFree: true,
+                        downloads: {
+                            'VST3': 'downloads/melody_engine_vst3.zip',
+                            'AU': 'downloads/melody_engine_au.zip'
+                        }
                     },
                     {
                         id: 'p_stem_gen',
@@ -111,7 +121,8 @@
                         image: "product_photos/stem_generator.png",
                         desc: "High quality stem generator for precise track isolation.",
                         options: ['VST3', 'AU'],
-                        badge: "Popular"
+                        badge: "Popular",
+                        isFree: false
                     },
                     {
                         id: 'p_reverse_synth',
@@ -120,7 +131,8 @@
                         image: "product_photos/reverse_synthesis.png",
                         desc: "Advanced reverse synthesis technology for accurate audio reconstruction.",
                         options: ['VST3', 'AU'],
-                        badge: "Premium"
+                        badge: "Premium",
+                        isFree: false
                     }
                 ]
             });
@@ -740,14 +752,25 @@
                             </div>
 
                             <div class="card-actions justify-end mt-6">
-                                <button @click="$store.cart.add({
-                                            ...product, 
-                                            // image is already on product, but ensure ID is unique
-                                            id: selectedOpt ? product.id + '_' + selectedOpt : product.id,
-                                            name: selectedOpt ? product.name + ' (' + selectedOpt + ')' : product.name
-                                        })" class="btn btn-primary btn-sm w-full gap-2 hover:bg-brand-700 text-white">
-                                    <i class="fa-solid fa-plus"></i> add to cart
-                                </button>
+                                <!-- Free Download Button -->
+                                <template x-if="product.isFree">
+                                    <button
+                                        @click="$dispatch('open-download-modal', { product: product, format: selectedOpt })"
+                                        class="btn btn-success btn-sm w-full gap-2 text-white shadow-lg hover:shadow-xl">
+                                        <i class="fa-solid fa-download"></i> download free
+                                    </button>
+                                </template>
+                                <!-- Paid Add to Cart Button -->
+                                <template x-if="!product.isFree">
+                                    <button @click="$store.cart.add({
+                                                ...product, 
+                                                id: selectedOpt ? product.id + '_' + selectedOpt : product.id,
+                                                name: selectedOpt ? product.name + ' (' + selectedOpt + ')' : product.name
+                                            })"
+                                        class="btn btn-primary btn-sm w-full gap-2 hover:bg-brand-700 text-white">
+                                        <i class="fa-solid fa-plus"></i> add to cart
+                                    </button>
+                                </template>
                             </div>
                         </div>
                     </div>
@@ -1042,6 +1065,137 @@
                     <button class="btn btn-ghost">Cancel</button>
                     <button class="btn btn-error text-white" @click="Alpine.store('cart').clear()">Clear Cart</button>
                 </form>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+
+    <!-- Free Download Modal with Info Collection -->
+    <dialog id="free_download_modal" class="modal modal-bottom sm:modal-middle" x-data="{ 
+            selectedProduct: null, 
+            selectedFormat: 'VST3',
+            formData: { name: '', email: '' },
+            isSubmitting: false,
+            error: null,
+            touched: { name: false, email: false },
+            get isNameValid() { return this.formData.name.trim().length > 0; },
+            get isEmailValid() { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.formData.email); },
+            get isValid() { return this.isNameValid && this.isEmailValid; },
+            init() {
+                window.addEventListener('open-download-modal', (e) => {
+                    this.selectedProduct = e.detail.product;
+                    this.selectedFormat = e.detail.format || 'VST3';
+                    this.formData = { name: '', email: '' };
+                    this.touched = { name: false, email: false };
+                    this.error = null;
+                    document.getElementById('free_download_modal').showModal();
+                });
+            },
+            async submitDownload() {
+                this.touched.name = true;
+                this.touched.email = true;
+                if (!this.isValid) return;
+                
+                this.isSubmitting = true;
+                this.error = null;
+                
+                try {
+                    const formData = new FormData();
+                    formData.append('name', this.formData.name);
+                    formData.append('email', this.formData.email);
+                    formData.append('product_id', this.selectedProduct.id);
+                    formData.append('product_name', this.selectedProduct.name);
+                    formData.append('format', this.selectedFormat);
+                    formData.append('download_path', this.selectedProduct.downloads?.[this.selectedFormat] || '');
+                    
+                    const response = await fetch('process_free_download.php', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.status === 'success') {
+                        // Trigger download
+                        const downloadUrl = this.selectedProduct.downloads?.[this.selectedFormat];
+                        if (downloadUrl) {
+                            const link = document.createElement('a');
+                            link.href = downloadUrl;
+                            link.download = '';
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                        }
+                        // Close modal after short delay
+                        setTimeout(() => {
+                            document.getElementById('free_download_modal').close();
+                        }, 500);
+                    } else {
+                        this.error = result.message || 'Something went wrong. Please try again.';
+                    }
+                } catch (err) {
+                    console.error('Download error:', err);
+                    this.error = 'Network error. Please try again.';
+                } finally {
+                    this.isSubmitting = false;
+                }
+            }
+        }">
+        <div class="modal-box relative bg-base-100 border border-base-200">
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle absolute right-2 top-2">✕</button>
+            </form>
+            <div class="text-center">
+                <div class="w-16 h-16 bg-success/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fa-solid fa-download text-4xl text-success"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2" x-text="selectedProduct?.name || 'Download Plugin'"></h3>
+                <p class="text-base-content/70 mb-4">Enter your info to get your free download.</p>
+
+                <!-- Error Alert -->
+                <div x-show="error" class="alert alert-error mb-4 text-sm">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span x-text="error"></span>
+                </div>
+
+                <!-- User Info Form -->
+                <div class="space-y-3 mb-4 text-left">
+                    <div class="form-control">
+                        <input type="text" x-model="formData.name" placeholder="Your Name" 
+                            class="input input-bordered w-full focus:input-success"
+                            :class="{'input-error': touched.name && !isNameValid}" />
+                        <span x-show="touched.name && !isNameValid" class="text-error text-xs mt-1 ml-1">Name is required</span>
+                    </div>
+                    <div class="form-control">
+                        <input type="email" x-model="formData.email" placeholder="your@email.com" 
+                            class="input input-bordered w-full focus:input-success"
+                            :class="{'input-error': touched.email && !isEmailValid}" />
+                        <span x-show="touched.email && !isEmailValid" class="text-error text-xs mt-1 ml-1">Valid email required</span>
+                    </div>
+                </div>
+
+                <!-- Format Selection -->
+                <div class="flex justify-center gap-4 mb-6" x-show="selectedProduct?.options">
+                    <template x-for="opt in selectedProduct?.options || []" :key="opt">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="download_format" :value="opt" x-model="selectedFormat"
+                                class="radio radio-success" />
+                            <span class="ml-2 font-medium" x-text="opt"></span>
+                        </label>
+                    </template>
+                </div>
+
+                <div class="modal-action justify-center flex-col gap-3">
+                    <button @click="submitDownload()" :disabled="isSubmitting"
+                        class="btn btn-success btn-wide text-white gap-2 shadow-lg">
+                        <span x-show="isSubmitting" class="loading loading-spinner loading-sm"></span>
+                        <i x-show="!isSubmitting" class="fa-solid fa-download"></i>
+                        <span x-text="isSubmitting ? 'Processing...' : 'Download ' + selectedFormat"></span>
+                    </button>
+                    <p class="text-xs text-base-content/50 mt-2">Free forever. We'll send you updates on new plugins.</p>
+                </div>
             </div>
         </div>
         <form method="dialog" class="modal-backdrop">
