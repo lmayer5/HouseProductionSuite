@@ -122,7 +122,11 @@
                         desc: "High quality stem generator for precise track isolation.",
                         options: ['VST3', 'AU'],
                         badge: "Popular",
-                        isFree: false
+                        isFree: false,
+                        downloads: {
+                            'VST3': 'downloads/stem_generator_vst3.zip',
+                            'AU': 'downloads/stem_generator_au.zip'
+                        }
                     },
                     {
                         id: 'p_reverse_synth',
@@ -132,7 +136,11 @@
                         desc: "Advanced reverse synthesis technology for accurate audio reconstruction.",
                         options: ['VST3', 'AU'],
                         badge: "Premium",
-                        isFree: false
+                        isFree: false,
+                        downloads: {
+                            'VST3': 'downloads/reverse_synthesis_vst3.zip',
+                            'AU': 'downloads/reverse_synthesis_au.zip'
+                        }
                     }
                 ]
             });
@@ -760,15 +768,12 @@
                                         <i class="fa-solid fa-download"></i> download free
                                     </button>
                                 </template>
-                                <!-- Paid Add to Cart Button -->
+                                <!-- Paid Download Button (uses same modal as free) -->
                                 <template x-if="!product.isFree">
-                                    <button @click="$store.cart.add({
-                                                ...product, 
-                                                id: selectedOpt ? product.id + '_' + selectedOpt : product.id,
-                                                name: selectedOpt ? product.name + ' (' + selectedOpt + ')' : product.name
-                                            })"
+                                    <button
+                                        @click="$dispatch('open-download-modal', { product: product, format: selectedOpt })"
                                         class="btn btn-primary btn-sm w-full gap-2 hover:bg-brand-700 text-white">
-                                        <i class="fa-solid fa-plus"></i> add to cart
+                                        <i class="fa-solid fa-download"></i> get plugin
                                     </button>
                                 </template>
                             </div>
@@ -1072,7 +1077,7 @@
         </form>
     </dialog>
 
-    <!-- Free Download Modal with Info Collection -->
+    <!-- Plugin Download Modal with Info Collection -->
     <dialog id="free_download_modal" class="modal modal-bottom sm:modal-middle" x-data="{ 
             selectedProduct: null, 
             selectedFormat: 'VST3',
@@ -1083,6 +1088,8 @@
             get isNameValid() { return this.formData.name.trim().length > 0; },
             get isEmailValid() { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.formData.email); },
             get isValid() { return this.isNameValid && this.isEmailValid; },
+            get isFree() { return this.selectedProduct?.isFree === true; },
+            get priceText() { return this.selectedProduct?.price > 0 ? '$' + this.selectedProduct.price.toFixed(2) : 'Free'; },
             init() {
                 window.addEventListener('open-download-modal', (e) => {
                     this.selectedProduct = e.detail.product;
@@ -1109,6 +1116,7 @@
                     formData.append('product_name', this.selectedProduct.name);
                     formData.append('format', this.selectedFormat);
                     formData.append('download_path', this.selectedProduct.downloads?.[this.selectedFormat] || '');
+                    formData.append('price', this.selectedProduct.price || 0);
                     
                     const response = await fetch('process_free_download.php', {
                         method: 'POST',
@@ -1148,11 +1156,17 @@
                 <button class="btn btn-sm btn-circle absolute right-2 top-2">✕</button>
             </form>
             <div class="text-center">
-                <div class="w-16 h-16 bg-success/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fa-solid fa-download text-4xl text-success"></i>
+                <!-- Icon changes color based on free/paid -->
+                <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+                    :class="isFree ? 'bg-success/20' : 'bg-brand-500/20'">
+                    <i class="fa-solid fa-download text-4xl" :class="isFree ? 'text-success' : 'text-brand-500'"></i>
                 </div>
-                <h3 class="text-xl font-bold text-white mb-2" x-text="selectedProduct?.name || 'Download Plugin'"></h3>
-                <p class="text-base-content/70 mb-4">Enter your info to get your free download.</p>
+                <h3 class="text-xl font-bold text-white mb-1" x-text="selectedProduct?.name || 'Download Plugin'"></h3>
+                <!-- Price badge for paid plugins -->
+                <div x-show="!isFree" class="badge badge-primary badge-lg mb-3" x-text="priceText"></div>
+                <p class="text-base-content/70 mb-4"
+                    x-text="isFree ? 'Enter your info to get your free download.' : 'Enter your info to get your plugin. All plugins currently available for free during beta!'">
+                </p>
 
                 <!-- Error Alert -->
                 <div x-show="error" class="alert alert-error mb-4 text-sm">
@@ -1163,16 +1177,18 @@
                 <!-- User Info Form -->
                 <div class="space-y-3 mb-4 text-left">
                     <div class="form-control">
-                        <input type="text" x-model="formData.name" placeholder="Your Name" 
-                            class="input input-bordered w-full focus:input-success"
-                            :class="{'input-error': touched.name && !isNameValid}" />
-                        <span x-show="touched.name && !isNameValid" class="text-error text-xs mt-1 ml-1">Name is required</span>
+                        <input type="text" x-model="formData.name" placeholder="Your Name"
+                            class="input input-bordered w-full"
+                            :class="{'input-error': touched.name && !isNameValid, 'focus:input-success': isFree, 'focus:input-primary': !isFree}" />
+                        <span x-show="touched.name && !isNameValid" class="text-error text-xs mt-1 ml-1">Name is
+                            required</span>
                     </div>
                     <div class="form-control">
-                        <input type="email" x-model="formData.email" placeholder="your@email.com" 
-                            class="input input-bordered w-full focus:input-success"
-                            :class="{'input-error': touched.email && !isEmailValid}" />
-                        <span x-show="touched.email && !isEmailValid" class="text-error text-xs mt-1 ml-1">Valid email required</span>
+                        <input type="email" x-model="formData.email" placeholder="your@email.com"
+                            class="input input-bordered w-full"
+                            :class="{'input-error': touched.email && !isEmailValid, 'focus:input-success': isFree, 'focus:input-primary': !isFree}" />
+                        <span x-show="touched.email && !isEmailValid" class="text-error text-xs mt-1 ml-1">Valid email
+                            required</span>
                     </div>
                 </div>
 
@@ -1181,7 +1197,7 @@
                     <template x-for="opt in selectedProduct?.options || []" :key="opt">
                         <label class="cursor-pointer">
                             <input type="radio" name="download_format" :value="opt" x-model="selectedFormat"
-                                class="radio radio-success" />
+                                :class="isFree ? 'radio radio-success' : 'radio radio-primary'" />
                             <span class="ml-2 font-medium" x-text="opt"></span>
                         </label>
                     </template>
@@ -1189,12 +1205,14 @@
 
                 <div class="modal-action justify-center flex-col gap-3">
                     <button @click="submitDownload()" :disabled="isSubmitting"
-                        class="btn btn-success btn-wide text-white gap-2 shadow-lg">
+                        class="btn btn-wide text-white gap-2 shadow-lg" :class="isFree ? 'btn-success' : 'btn-primary'">
                         <span x-show="isSubmitting" class="loading loading-spinner loading-sm"></span>
                         <i x-show="!isSubmitting" class="fa-solid fa-download"></i>
                         <span x-text="isSubmitting ? 'Processing...' : 'Download ' + selectedFormat"></span>
                     </button>
-                    <p class="text-xs text-base-content/50 mt-2">Free forever. We'll send you updates on new plugins.</p>
+                    <p class="text-xs text-base-content/50 mt-2"
+                        x-text="isFree ? 'Free forever. We\'ll send you updates on new plugins.' : 'Beta access - currently free! We\'ll notify you about updates.'">
+                    </p>
                 </div>
             </div>
         </div>

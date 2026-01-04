@@ -57,9 +57,12 @@ try {
         $currentOrders = json_decode($fileContent, true) ?? [];
     }
 
+    $price = floatval($_POST['price'] ?? 0);
+    $downloadType = $price > 0 ? 'paid_download' : 'free_download';
+
     $newDownload = [
         'id' => uniqid('DL-'),
-        'type' => 'free_download',
+        'type' => $downloadType,
         'timestamp' => date('c'),
         'customer' => [
             'name' => htmlspecialchars($name),
@@ -69,7 +72,7 @@ try {
             'product_id' => $productId,
             'product_name' => $productName,
             'format' => $format,
-            'total' => 0
+            'total' => $price
         ],
         'status' => 'completed'
     ];

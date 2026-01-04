@@ -1,5 +1,4 @@
-# DEBUG MODE: Enable directory browsing to see what is actually on the server
-Options +Indexes
+# Force directory index
 DirectoryIndex index.html index.php
 
 # Block access to dotfiles (like .git, .env)
@@ -8,11 +7,27 @@ DirectoryIndex index.html index.php
     Deny from all
 </FilesMatch>
 
-# Block access to the vendor directory
+# Block access to sensitive directories
 <IfModule mod_rewrite.c>
     RewriteEngine On
+    
+    # Block vendor directory
     RewriteRule ^vendor/.*$ - [F,L]
     
-    # FORCE ROOT TO INDEX.HTML (Fix for stubborn 403s)
-    RewriteRule ^$ index.html [L]
+    # Block private_data directory  
+    RewriteRule ^private_data/.*$ - [F,L]
+    
+    # Block admin directory from non-authenticated access (optional)
+    # RewriteRule ^admin/.*$ - [F,L]
 </IfModule>
+
+# Allow access to download files
+<FilesMatch "\.(zip|pdf)$">
+    Order allow,deny
+    Allow from all
+</FilesMatch>
+
+# Ensure PHP files can execute
+<FilesMatch "\.php$">
+    SetHandler application/x-httpd-php
+</FilesMatch>
