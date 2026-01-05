@@ -1,0 +1,18 @@
+{
+  "source_file": "JUCE\\examples\\Assets\\singing.ogg",
+  "engine": "demucs_htdemucs",
+  "processing_time_seconds": 21.923957347869873,
+  "success": true,
+  "quality_scores": {
+    "vocals": 36.21621608734131,
+    "drums": -8.586580753326416,
+    "bass": -10.747746229171753,
+    "other": -15.820802450180054
+  },
+  "stems": {
+    "drums": "data\\stems\\Unknown Artist - singing_c12c7fa8\\drums.wav",
+    "bass": "data\\stems\\Unknown Artist - singing_c12c7fa8\\bass.wav",
+    "other": "data\\stems\\Unknown Artist - singing_c12c7fa8\\other.wav",
+    "vocals": "data\\stems\\Unknown Artist - singing_c12c7fa8\\vocals.wav"
+  }
+}
